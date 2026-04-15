@@ -7,6 +7,7 @@ import { ArcgisMap, ArcgisSearch, ArcgisLegend } from "@arcgis/map-components-re
 // import defineCustomElements to register custom elements with the custom elements registry
 import { defineCustomElements as defineMapElements } from "@arcgis/map-components/dist/loader";
 import MapWebComponent from './components/Map/MapWebComponent';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Importa Bootstrap aquí
 defineMapElements(window, { resourcesUrl: "https://js.arcgis.com/map-components/4.30/assets" });
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);

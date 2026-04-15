@@ -3,6 +3,7 @@
 import React from 'react';
 import MapComponent from './components/Map/MapComponent';
 import './App.css';
+import './styles/rrhStyles.css';
 
 const App: React.FC = () => {
   return (
