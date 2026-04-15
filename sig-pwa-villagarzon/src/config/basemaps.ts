@@ -1,7 +1,7 @@
 export const basemaps = [
   {
     id: "streets",
-    name: "Calles",
+    name: "Político",
     style: "https://demotiles.maplibre.org/style.json"
   },
   {

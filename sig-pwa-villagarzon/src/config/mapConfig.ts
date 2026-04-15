@@ -1,4 +1,4 @@
 export const mapConfig = {
-  center: [-77.2811, 1.2136],
-  zoom: 7
+  center: [-76.616553, 1.026411],
+  zoom: 14
 };
