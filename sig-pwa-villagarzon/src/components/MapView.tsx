@@ -5,6 +5,8 @@ import { mapConfig } from "../config/mapConfig";
 import BasemapSwitcher from "./basemapSwitcher/BasemapSwitcher";
 import MapStatusBar from "./mapStatusBar/MapStatusBar";
 import { to3116, to4686, to9377, toUTM } from "../utils/projections";
+import ScaleControl from "./scaleControl/ScaleControl";
+import ScaleBar from "./scaleBar/ScaleBar";
 
 
 const MapView = () => {
@@ -70,6 +72,8 @@ const MapView = () => {
     <>
         <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
         <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} epsg3116={epsg3116} epsg9377={epsg9377} utm={utm} utmZone={utmZone} />
+        <ScaleBar map={mapRef.current} />
+        <ScaleControl map={mapRef.current} />
         <div
         ref={mapContainer}
         style={{ width: "100%", height: "100vh" }}

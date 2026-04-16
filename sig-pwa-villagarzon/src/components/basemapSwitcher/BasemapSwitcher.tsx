@@ -17,7 +17,9 @@ const BasemapSwitcher = ({ onChange, mapaBase }: Props) => {
       top: 10,
       right: 10,
       zIndex: 1000,
-      background: "white",
+      background: "rgba(0,0,0,0.7)",
+      color: "white",
+
       padding: "8px",
       borderRadius: "5px"
     }}>
