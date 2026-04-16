@@ -10,6 +10,7 @@ interface Props {
 const MapControls: React.FC<Props> = ({ map }) => {
   const history = useRef<any[]>([]);
   const future = useRef<any[]>([]);
+  const isNavigating = useRef(false);
   const [initialView, setInitialView] = useState<any>(null);
   const [hasPrev, setHasPrev] = useState(false);
   const [hasNext, setHasNext] = useState(false);
@@ -27,6 +28,11 @@ const MapControls: React.FC<Props> = ({ map }) => {
     history.current.push(init);
 
     const saveHistory = () => {
+      if (isNavigating.current) {
+        isNavigating.current = false;
+        return;
+      }
+
       const view = {
         center: map.getCenter(),
         zoom: map.getZoom()
@@ -50,6 +56,7 @@ const MapControls: React.FC<Props> = ({ map }) => {
   const goHome = () => {
     if (!initialView) return;
 
+    isNavigating.current = true;
     map.flyTo(initialView);
   };
 
@@ -59,7 +66,6 @@ const MapControls: React.FC<Props> = ({ map }) => {
 
   // PREVIOUS
   const goPrevious = () => {
-
     if (history.current.length <= 1) return;
 
     const current = history.current.pop();
@@ -67,6 +73,7 @@ const MapControls: React.FC<Props> = ({ map }) => {
 
     const prev = history.current[history.current.length - 1];
 
+    isNavigating.current = true;
     map.flyTo(prev);
 
     setHasPrev(history.current.length > 1);
@@ -80,6 +87,7 @@ const MapControls: React.FC<Props> = ({ map }) => {
     const next = future.current.pop();
     history.current.push(next);
 
+    isNavigating.current = true;
     map.flyTo(next);
 
     setHasPrev(true);
