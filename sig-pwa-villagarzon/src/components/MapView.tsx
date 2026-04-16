@@ -4,16 +4,17 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { mapConfig } from "../config/mapConfig";
 import BasemapSwitcher from "./basemapSwitcher/BasemapSwitcher";
 import MapStatusBar from "./mapStatusBar/MapStatusBar";
+import { to4686 } from "../utils/projections";
 
 
 const MapView = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const [style, setStyle] = useState<string | object>(
-    "https://tiles.openfreemap.org/styles/liberty"
-  );
+  const [mapaBase, setMapaBase] = useState<string | object>(mapConfig.mapaBase);
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
+  const [lat4686, setLat4686] = useState(0);
+  const [lng4686, setLng4686] = useState(0);
   const [zoom, setZoom] = useState(mapConfig.zoom);
 
   useEffect(() => {
@@ -21,8 +22,8 @@ const MapView = () => {
 
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: style as maplibregl.StyleSpecification | string,
-      center: mapConfig.center as [number, number], // Pasto ejemplo
+      style: mapaBase as maplibregl.StyleSpecification | string,
+      center: mapConfig.center as [number, number],
       zoom: mapConfig.zoom
     });
 
@@ -30,8 +31,13 @@ const MapView = () => {
 
     // Evento movimiento cursor
     mapRef.current.on("mousemove", (e) => {
-      setLat(e.lngLat.lat);
-      setLng(e.lngLat.lng);
+        const lat = e.lngLat.lat;
+        const lng = e.lngLat.lng;
+        setLat(lat);
+        setLng(lng);
+        const [lng4686, lat4686] = to4686(lng, lat);
+        setLat4686(lat4686);
+        setLng4686(lng4686);
     });
 
     // Evento zoom
@@ -41,17 +47,17 @@ const MapView = () => {
     });
 
     return () => map.remove()
-  }, [style]);
+  }, [mapaBase]);
 
   const changeBasemap = (newStyle: string | object) => {
-    setStyle(newStyle);
+    setMapaBase(newStyle);
     setZoom(mapConfig.zoom); // Reiniciar zoom al cambiar mapa base
   };
 
   return (
     <>
-        <BasemapSwitcher onChange={changeBasemap} />
-        <MapStatusBar lat={lat} lng={lng} zoom={zoom} />
+        <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
+        <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} />
         <div
         ref={mapContainer}
         style={{ width: "100%", height: "100vh" }}

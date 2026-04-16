@@ -2,9 +2,10 @@ import { basemaps } from "../../config/basemaps";
 
 interface Props {
   onChange: (style: string | object) => void;
+  mapaBase: string | object;
 }
 
-const BasemapSwitcher = ({ onChange }: Props) => {
+const BasemapSwitcher = ({ onChange, mapaBase }: Props) => {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = basemaps.find((b) => b.id === e.target.value);
     if (selected) onChange(selected.style);
@@ -21,7 +22,7 @@ const BasemapSwitcher = ({ onChange }: Props) => {
       borderRadius: "5px"
     }}>
       <p>Mapas base</p>
-      <select onChange={handleChange}>
+      <select onChange={handleChange} value={basemaps.find((b) => b.style === mapaBase)?.id}>
         {basemaps.map((basemap) => (
           <option key={basemap.id} value={basemap.id}>
             {basemap.name}

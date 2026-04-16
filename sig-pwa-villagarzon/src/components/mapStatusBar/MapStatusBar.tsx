@@ -1,12 +1,14 @@
 import React from "react";
 
 interface Props {
-  lat: number;
-  lng: number;
-  zoom: number;
+    lat: number;
+    lng: number;
+    zoom: number;
+    lat4686: number;
+    lng4686: number;
 }
 
-const MapStatusBar: React.FC<Props> = ({ lat, lng, zoom }) => {
+const MapStatusBar: React.FC<Props> = ({ lat, lng, lat4686, lng4686,zoom }) => {
   return (
     <div
       style={{
@@ -21,9 +23,19 @@ const MapStatusBar: React.FC<Props> = ({ lat, lng, zoom }) => {
         fontSize: "12px"
       }}
     >
+      <div><strong>WGS84</strong></div>
       <div>Lat: {lat.toFixed(6)}</div>
       <div>Lng: {lng.toFixed(6)}</div>
-      <div>Zoom: {zoom.toFixed(2)}</div>
+
+      <div style={{ marginTop: "5px" }}>
+        <strong>EPSG:4686</strong>
+      </div>
+      <div>Lat: {lat4686.toFixed(6)}</div>
+      <div>Lng: {lng4686.toFixed(6)}</div>
+
+      <div style={{ marginTop: "5px" }}>
+        Zoom: {zoom.toFixed(2)}
+      </div>
     </div>
   );
 };
