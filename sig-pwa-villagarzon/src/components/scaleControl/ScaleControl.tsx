@@ -28,7 +28,6 @@ const ScaleControl: React.FC<Props> = ({ map }) => {
 
     const zoom = map.getZoom();
     const scale = 591657550.5 / Math.pow(2, zoom);
-    console.log({ zoom, scale });
     setScale(Math.round(scale));
   };
 
@@ -36,7 +35,6 @@ const ScaleControl: React.FC<Props> = ({ map }) => {
     if (!map) return;
 
     const zoom = Math.log2(591657550.5 / value);
-    console.log({zoom})
     map.zoomTo(zoom);
   };
 

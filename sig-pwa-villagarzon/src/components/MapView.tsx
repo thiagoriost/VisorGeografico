@@ -7,6 +7,7 @@ import MapStatusBar from "./mapStatusBar/MapStatusBar";
 import { to3116, to4686, to9377, toUTM } from "../utils/projections";
 import ScaleControl from "./scaleControl/ScaleControl";
 import ScaleBar from "./scaleBar/ScaleBar";
+import MapHeader from "./mapHeader/MapHeader";
 
 
 const MapView = () => {
@@ -70,6 +71,11 @@ const MapView = () => {
 
   return (
     <>
+        <MapHeader
+          title="Sistema de Información Geográfico"
+          subtitle="Visor Territorial"
+          logo="/logo.png"
+        />
         <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
         <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} epsg3116={epsg3116} epsg9377={epsg9377} utm={utm} utmZone={utmZone} />
         <ScaleBar map={mapRef.current} />
