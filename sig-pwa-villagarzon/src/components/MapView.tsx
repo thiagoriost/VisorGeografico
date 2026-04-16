@@ -4,7 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { mapConfig } from "../config/mapConfig";
 import BasemapSwitcher from "./basemapSwitcher/BasemapSwitcher";
 import MapStatusBar from "./mapStatusBar/MapStatusBar";
-import { to4686 } from "../utils/projections";
+import { to3116, to4686, to9377, toUTM } from "../utils/projections";
 
 
 const MapView = () => {
@@ -16,6 +16,11 @@ const MapView = () => {
   const [lat4686, setLat4686] = useState(0);
   const [lng4686, setLng4686] = useState(0);
   const [zoom, setZoom] = useState(mapConfig.zoom);
+  const [utm, setUtm] = useState([0, 0]);
+  const [utmZone, setUtmZone] = useState(0);
+
+  const [epsg3116, set3116] = useState([0, 0]);
+  const [epsg9377, set9377] = useState([0, 0]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -38,6 +43,13 @@ const MapView = () => {
         const [lng4686, lat4686] = to4686(lng, lat);
         setLat4686(lat4686);
         setLng4686(lng4686);
+
+        set3116(to3116(lng, lat));
+        set9377(to9377(lng, lat));
+
+        const utmData = toUTM(lng, lat);
+        setUtm(utmData.coords);
+        setUtmZone(utmData.zone);
     });
 
     // Evento zoom
@@ -57,7 +69,7 @@ const MapView = () => {
   return (
     <>
         <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
-        <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} />
+        <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} epsg3116={epsg3116} epsg9377={epsg9377} utm={utm} utmZone={utmZone} />
         <div
         ref={mapContainer}
         style={{ width: "100%", height: "100vh" }}
