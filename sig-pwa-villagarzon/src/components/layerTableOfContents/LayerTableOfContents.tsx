@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
+import maplibregl from "maplibre-gl";
 
 const schools = JSON.parse(schoolsRaw);
 
@@ -12,6 +14,18 @@ export default function LayerTableOfContents({ map }: Props) {
 
   const toggleLayer = () => {
     if (!map) return;
+
+    map.on("click","schools-circle",(e: { features: any[]; })=>{
+        console.log({e})
+        const feature=e.features[0];
+
+        new maplibregl.Popup()
+        .setLngLat(feature.geometry.coordinates)
+        .setHTML(
+        feature.properties.nombre
+        )
+        .addTo(map);
+    });
 
     if (!active) {
       if (!map.getSource("schools")) {
@@ -33,9 +47,9 @@ export default function LayerTableOfContents({ map }: Props) {
         });
       }
     } else {
-      if (map.getLayer("schools-circle")) {
-        map.removeLayer("schools-circle");
-      }
+        if (map.getLayer("schools-circle")) {
+            map.removeLayer("schools-circle");
+        }
 
       if (map.getSource("schools")) {
         map.removeSource("schools");

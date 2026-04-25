@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import maplibregl, { Map as MaplibreMap, Marker, LngLat } from "maplibre-gl";
+import maplibregl, { Marker, LngLat } from "maplibre-gl";
 import { HomeIcon, LocationIcon, NextIcon, PrevIcon, ZoomInIcon, ZoomOutIcon } from "./Icons";
 import Button from "../roundButton/Button";
+import type { Props } from "../../utils/interfaces";
 
 /** Vista del mapa (centro + zoom) para el historial de navegación. */
 interface MapView {
@@ -9,10 +10,7 @@ interface MapView {
   zoom: number;
 }
 
-interface Props {
-  /** Instancia del mapa MapLibre GL. */
-  map: MaplibreMap | null;
-}
+
 
 /**
  * Controles de navegación del mapa.

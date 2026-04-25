@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-interface Props {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  map: any;
-}
+import type { Props } from "../../utils/interfaces";
 
 const ScaleBar: React.FC<Props> = ({ map }) => {
   const [scaleWidth, setScaleWidth] = useState(100);
