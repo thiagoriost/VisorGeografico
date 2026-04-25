@@ -1,25 +1,38 @@
 import React, { useEffect, useRef, useState } from "react";
-import maplibregl from "maplibre-gl";
+import maplibregl, { Map as MaplibreMap, Marker, LngLat } from "maplibre-gl";
 import { HomeIcon, LocationIcon, NextIcon, PrevIcon, ZoomInIcon, ZoomOutIcon } from "./Icons";
 import Button from "../roundButton/Button";
 
-interface Props {
-  map: any;
+/** Vista del mapa (centro + zoom) para el historial de navegación. */
+interface MapView {
+  center: LngLat;
+  zoom: number;
 }
 
+interface Props {
+  /** Instancia del mapa MapLibre GL. */
+  map: MaplibreMap | null;
+}
+
+/**
+ * Controles de navegación del mapa.
+ *
+ * Incluye: Home, Zoom In/Out, Mi ubicación,
+ * navegación de vistas anterior/siguiente.
+ */
 const MapControls: React.FC<Props> = ({ map }) => {
-  const history = useRef<any[]>([]);
-  const future = useRef<any[]>([]);
+  const history = useRef<MapView[]>([]);
+  const future = useRef<MapView[]>([]);
   const isNavigating = useRef(false);
-  const [initialView, setInitialView] = useState<any>(null);
+  const [initialView, setInitialView] = useState<MapView | null>(null);
   const [hasPrev, setHasPrev] = useState(false);
   const [hasNext, setHasNext] = useState(false);
-  const locationMarker = useRef<any>(null);
+  const locationMarker = useRef<Marker | null>(null);
 
   useEffect(() => {
     if (!map) return;
 
-    const init = {
+    const init: MapView = {
       center: map.getCenter(),
       zoom: map.getZoom()
     };
@@ -27,13 +40,17 @@ const MapControls: React.FC<Props> = ({ map }) => {
     setInitialView(init);
     history.current.push(init);
 
+    /**
+     * Guarda la vista actual en el historial cuando el mapa termina de moverse.
+     * Se ignora si el movimiento fue disparado por navegación programática.
+     */
     const saveHistory = () => {
       if (isNavigating.current) {
         isNavigating.current = false;
         return;
       }
 
-      const view = {
+      const view: MapView = {
         center: map.getCenter(),
         zoom: map.getZoom()
       };
@@ -52,23 +69,25 @@ const MapControls: React.FC<Props> = ({ map }) => {
     };
   }, [map]);
 
-  // HOME
+  /** Vuela a la vista inicial del mapa. */
   const goHome = () => {
-    if (!initialView) return;
+    if (!initialView || !map) return;
 
     isNavigating.current = true;
     map.flyTo(initialView);
   };
 
-  // ZOOM
-  const zoomIn = () => map.zoomIn();
-  const zoomOut = () => map.zoomOut();
+  /** Incrementa el nivel de zoom en 1. */
+  const zoomIn = () => map?.zoomIn();
 
-  // PREVIOUS
+  /** Decrementa el nivel de zoom en 1. */
+  const zoomOut = () => map?.zoomOut();
+
+  /** Navega a la vista anterior en el historial. */
   const goPrevious = () => {
-    if (history.current.length <= 1) return;
+    if (history.current.length <= 1 || !map) return;
 
-    const current = history.current.pop();
+    const current = history.current.pop()!;
     future.current.push(current);
 
     const prev = history.current[history.current.length - 1];
@@ -80,11 +99,11 @@ const MapControls: React.FC<Props> = ({ map }) => {
     setHasNext(true);
   };
 
-  // NEXT
+  /** Navega a la vista siguiente en el historial. */
   const goNext = () => {
-    if (!future.current.length) return;
+    if (!future.current.length || !map) return;
 
-    const next = future.current.pop();
+    const next = future.current.pop()!;
     history.current.push(next);
 
     isNavigating.current = true;
@@ -94,9 +113,11 @@ const MapControls: React.FC<Props> = ({ map }) => {
     setHasNext(future.current.length > 0);
   };
 
-  // LOCATION
+  /**
+   * Centra el mapa en la ubicación del usuario y agrega un marcador.
+   * Si ya existe un marcador, lo elimina (toggle).
+   */
   const goMyLocation = () => {
-
     if (locationMarker.current) {
       locationMarker.current.remove();
       locationMarker.current = null;
@@ -104,6 +125,8 @@ const MapControls: React.FC<Props> = ({ map }) => {
     }
 
     navigator.geolocation.getCurrentPosition((pos) => {
+      if (!map) return;
+
       const { latitude, longitude } = pos.coords;
 
       map.flyTo({
@@ -119,15 +142,14 @@ const MapControls: React.FC<Props> = ({ map }) => {
         </svg>
       `;
 
-      locationMarker.current = new maplibregl.Marker(el)
+      locationMarker.current = new maplibregl.Marker({ element: el })
         .setLngLat([longitude, latitude])
         .addTo(map);
-
     });
   };
 
   // STYLE
-  const btnStyle: any = {
+  const btnStyle: React.CSSProperties = {
     width: "42px",
     height: "42px",
     borderRadius: "50%",
@@ -142,12 +164,12 @@ const MapControls: React.FC<Props> = ({ map }) => {
     transition: "all .2s ease"
   };
 
-  const disabledStyle = {
+  const disabledStyle: React.CSSProperties = {
     opacity: .4,
     cursor: "not-allowed"
   };
 
-  const hoverStyle = {
+  const hoverStyle: React.CSSProperties = {
     transform: "scale(1.05)",
     background: "rgba(0,0,0,1)",
   };
