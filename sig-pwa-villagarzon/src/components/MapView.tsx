@@ -9,6 +9,7 @@ import ScaleControl from "./scaleControl/ScaleControl";
 import ScaleBar from "./scaleBar/ScaleBar";
 import MapHeader from "./mapHeader/MapHeader";
 import MapControls from "./mapControls/MapControls";
+import LayerTableOfContents from "./layerTableOfContents/LayerTableOfContents";
 
 
 const MapView = () => {
@@ -82,9 +83,10 @@ const MapView = () => {
         <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} epsg3116={epsg3116} epsg9377={epsg9377} utm={utm} utmZone={utmZone} />
         <ScaleBar map={mapRef.current} />
         <ScaleControl map={mapRef.current} />
+        <LayerTableOfContents map={mapRef.current} />
         <div
-        ref={mapContainer}
-        style={{ width: "100%", height: "100vh" }}
+          ref={mapContainer}
+          style={{ width: "100%", height: "100vh" }}
         />
     </>
   );
