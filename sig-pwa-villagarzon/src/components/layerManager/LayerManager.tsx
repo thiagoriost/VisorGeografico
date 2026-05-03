@@ -3,6 +3,7 @@ import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
 import type { Props } from "../../utils/interfaces";
 import maplibregl from "maplibre-gl";
 import { getSchoolsOSM } from "../../services/osmService";
+import FeatureDetailsPanel from "./FeatureDetailsPanel";
 import LayerLoading from "./LayerLoading";
 import "./LayerManager.css";
 
@@ -31,10 +32,20 @@ type LayerItem = {
   opacity: number;
 };
 
+type SelectedFeatureDetails = {
+  featureName: string;
+  lat: number;
+  lon: number;
+};
+
 export default function LayerManager({ map }: Props) {
   const [expanded, setExpanded] = useState(true);
   const [loadingLayerId, setLoadingLayerId] = useState<string | null>(null);
+  const [selectedFeatureDetails, setSelectedFeatureDetails] =
+    useState<SelectedFeatureDetails | null>(null);
+  const [isDetailsMinimized, setIsDetailsMinimized] = useState(false);
   const inMemoryCacheRef = useRef<Record<string, SchoolsFeatureCollection>>({});
+  const popupRef = useRef<maplibregl.Popup | null>(null);
 
   const [layers, setLayers] = useState<LayerItem[]>([
     {
@@ -134,6 +145,22 @@ export default function LayerManager({ map }: Props) {
     purgeExpiredLayerCaches();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      popupRef.current?.remove();
+    };
+  }, []);
+
+  const openFeatureDetails = (details: SelectedFeatureDetails) => {
+    setSelectedFeatureDetails(details);
+    setIsDetailsMinimized(false);
+  };
+
+  const closeFeatureDetails = () => {
+    setSelectedFeatureDetails(null);
+    setIsDetailsMinimized(false);
+  };
+
   const resolveLayerData = async (layer: LayerItem): Promise<SchoolsFeatureCollection> => {
     const memoryCached = inMemoryCacheRef.current[layer.id];
     if (memoryCached) {
@@ -206,13 +233,41 @@ export default function LayerManager({ map }: Props) {
           (f.properties as { nombre?: string })?.nombre || "Sin nombre",
         );
 
-        new maplibregl.Popup()
+        openFeatureDetails({
+          featureName,
+          lon,
+          lat,
+        });
+
+        const popupContent = document.createElement("div");
+        popupContent.className = "feature-popup";
+
+        const title = document.createElement("p");
+        title.className = "feature-popup__name";
+        title.textContent = featureName;
+
+        const coord = document.createElement("p");
+        coord.className = "feature-popup__coords";
+        coord.textContent = `Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
+
+        const detailsButton = document.createElement("button");
+        detailsButton.type = "button";
+        detailsButton.className = "feature-popup__button";
+        detailsButton.textContent = "Ver detalles";
+        detailsButton.addEventListener("click", () => {
+          openFeatureDetails({
+            featureName,
+            lon,
+            lat,
+          });
+        });
+
+        popupContent.append(title, coord, detailsButton);
+
+        popupRef.current?.remove();
+        popupRef.current = new maplibregl.Popup()
           .setLngLat([lon, lat])
-          .setHTML(`
-            <b>${featureName}</b>
-            <br/>
-            Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}
-          `)
+          .setDOMContent(popupContent)
           .addTo(map);
       });
     } else {
@@ -298,6 +353,15 @@ export default function LayerManager({ map }: Props) {
 
   return (
     <div className="layer-manager">
+      {selectedFeatureDetails && (
+        <FeatureDetailsPanel
+          details={selectedFeatureDetails}
+          minimized={isDetailsMinimized}
+          onToggleMinimize={() => setIsDetailsMinimized((prev) => !prev)}
+          onClose={closeFeatureDetails}
+        />
+      )}
+
       {loadingLayer && (
         <LayerLoading layerName={loadingLayer.name} />
       )}

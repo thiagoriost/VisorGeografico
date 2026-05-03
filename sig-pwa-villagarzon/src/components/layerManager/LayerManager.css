@@ -59,3 +59,34 @@
   font-size: 11px;
   color: #64748b;
 }
+
+.feature-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.feature-popup__name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.feature-popup__coords {
+  margin: 0;
+  font-size: 12px;
+  color: #334155;
+}
+
+.feature-popup__button {
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 5px 8px;
+}
