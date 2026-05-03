@@ -4,6 +4,7 @@ type SelectedFeatureDetails = {
   featureName: string;
   lat: number;
   lon: number;
+  imageUrl?: string;
 };
 
 type FeatureDetailsPanelProps = {
@@ -48,6 +49,20 @@ export default function FeatureDetailsPanel({
           <p className="feature-details-panel__name">{details.featureName}</p>
           <p className="feature-details-panel__line">Latitud: {details.lat.toFixed(6)}</p>
           <p className="feature-details-panel__line">Longitud: {details.lon.toFixed(6)}</p>
+
+            {details.imageUrl ? (
+                <div className="feature-details-panel__image-wrap">
+                    <img
+                        src={details.imageUrl}
+                        alt={`Imagen de ${details.featureName}`}
+                        className="feature-details-panel__image"
+                    />
+                </div>
+            ) : (
+              <div className="feature-details-panel__image-placeholder">
+                Espacio reservado para imagen del centro educativo
+              </div>
+            )}
         </div>
       )}
     </div>

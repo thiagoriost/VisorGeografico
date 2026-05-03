@@ -36,6 +36,7 @@ type SelectedFeatureDetails = {
   featureName: string;
   lat: number;
   lon: number;
+  imageUrl?: string;
 };
 
 export default function LayerManager({ map }: Props) {
@@ -233,11 +234,14 @@ export default function LayerManager({ map }: Props) {
           (f.properties as { nombre?: string })?.nombre || "Sin nombre",
         );
 
-        openFeatureDetails({
+        const detailsData: SelectedFeatureDetails = {
           featureName,
           lon,
           lat,
-        });
+        };
+
+        // Al seleccionar otro feature, cerramos cualquier detalle previo.
+        closeFeatureDetails();
 
         const popupContent = document.createElement("div");
         popupContent.className = "feature-popup";
@@ -255,11 +259,7 @@ export default function LayerManager({ map }: Props) {
         detailsButton.className = "feature-popup__button";
         detailsButton.textContent = "Ver detalles";
         detailsButton.addEventListener("click", () => {
-          openFeatureDetails({
-            featureName,
-            lon,
-            lat,
-          });
+          openFeatureDetails(detailsData);
         });
 
         popupContent.append(title, coord, detailsButton);
@@ -269,6 +269,9 @@ export default function LayerManager({ map }: Props) {
           .setLngLat([lon, lat])
           .setDOMContent(popupContent)
           .addTo(map);
+
+        // Si el popup se cierra (ej. click fuera), cerramos también el panel.
+        popupRef.current.on("close", closeFeatureDetails);
       });
     } else {
       map.setPaintProperty(circleId, "circle-opacity", layer.opacity);
