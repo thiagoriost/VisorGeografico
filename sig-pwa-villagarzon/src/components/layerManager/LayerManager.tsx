@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
 import type { Props } from "../../utils/interfaces";
 import maplibregl from "maplibre-gl";
@@ -11,6 +11,17 @@ type SchoolsFeatureCollection = GeoJSON.FeatureCollection<
 >;
 
 const schools = JSON.parse(schoolsRaw) as SchoolsFeatureCollection;
+const getCurrentTimestamp = () => Date.now();
+
+const LAYER_CACHE_PREFIX = "layer-cache-v1";
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+
+type LayerCacheEntry = {
+  version: 1;
+  savedAt: number;
+  expiresAt: number;
+  data: SchoolsFeatureCollection;
+};
 
 type LayerItem = {
   id: string;
@@ -21,6 +32,7 @@ type LayerItem = {
 
 export default function LayerManager({ map }: Props) {
   const [expanded, setExpanded] = useState(true);
+  const inMemoryCacheRef = useRef<Record<string, SchoolsFeatureCollection>>({});
 
   const [layers, setLayers] = useState<LayerItem[]>([
     {
@@ -34,40 +46,129 @@ export default function LayerManager({ map }: Props) {
   const getSourceId = (layerId: string) => `${layerId}-source`;
   const getCircleId = (layerId: string) => `${layerId}-circle`;
 
-  const removeLayerFromMap = (layerId: string) => {
+  const getCacheKey = (layerId: string) => `${LAYER_CACHE_PREFIX}:${layerId}`;
+
+  const purgeExpiredLayerCaches = () => {
+    try {
+      const now = getCurrentTimestamp();
+
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith(`${LAYER_CACHE_PREFIX}:`)) continue;
+
+        const rawValue = localStorage.getItem(key);
+        if (!rawValue) continue;
+
+        try {
+          const parsed = JSON.parse(rawValue) as Partial<LayerCacheEntry>;
+          if (!parsed.expiresAt || parsed.expiresAt <= now) {
+            localStorage.removeItem(key);
+          }
+        } catch {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch {
+      // localStorage puede estar bloqueado por permisos del navegador.
+    }
+  };
+
+  const readLayerLocalCache = (
+    layerId: string,
+  ): SchoolsFeatureCollection | null => {
+    try {
+      const rawValue = localStorage.getItem(getCacheKey(layerId));
+      if (!rawValue) return null;
+
+      const parsed = JSON.parse(rawValue) as Partial<LayerCacheEntry>;
+      const now = getCurrentTimestamp();
+
+      if (!parsed.expiresAt || parsed.expiresAt <= now) {
+        localStorage.removeItem(getCacheKey(layerId));
+        return null;
+      }
+
+      if (
+        !parsed.data ||
+        parsed.data.type !== "FeatureCollection" ||
+        !Array.isArray(parsed.data.features)
+      ) {
+        localStorage.removeItem(getCacheKey(layerId));
+        return null;
+      }
+
+      return parsed.data as SchoolsFeatureCollection;
+    } catch {
+      return null;
+    }
+  };
+
+  const saveLayerLocalCache = (layerId: string, data: SchoolsFeatureCollection) => {
+    try {
+      const now = getCurrentTimestamp();
+      const payload: LayerCacheEntry = {
+        version: 1,
+        savedAt: now,
+        expiresAt: now + CACHE_TTL_MS,
+        data,
+      };
+
+      localStorage.setItem(getCacheKey(layerId), JSON.stringify(payload));
+    } catch {
+      // Puede fallar por cuota llena; el mapa sigue funcionando con cache en memoria.
+    }
+  };
+
+  const setLayerVisibility = (layerId: string, visible: boolean) => {
     if (!map) return;
 
-    const sourceId = getSourceId(layerId);
     const circleId = getCircleId(layerId);
+    if (!map.getLayer(circleId)) return;
 
-    if (map.getLayer(circleId)) {
-      map.removeLayer(circleId);
+    map.setLayoutProperty(circleId, "visibility", visible ? "visible" : "none");
+  };
+
+  useEffect(() => {
+    purgeExpiredLayerCaches();
+  }, []);
+
+  const resolveLayerData = async (layer: LayerItem): Promise<SchoolsFeatureCollection> => {
+    const memoryCached = inMemoryCacheRef.current[layer.id];
+    if (memoryCached) {
+      return memoryCached;
     }
 
-    if (map.getSource(sourceId)) {
-      map.removeSource(sourceId);
+    const localCached = readLayerLocalCache(layer.id);
+    if (localCached) {
+      inMemoryCacheRef.current[layer.id] = localCached;
+      return localCached;
+    }
+
+    try {
+      const onlineData = await getSchoolsOSM();
+      const selectedData = onlineData.features.length > 0 ? onlineData : schools;
+
+      if (onlineData.features.length === 0) {
+        console.warn("OSM sin resultados, usando data offline");
+      }
+
+      inMemoryCacheRef.current[layer.id] = selectedData;
+      saveLayerLocalCache(layer.id, selectedData);
+      return selectedData;
+    } catch (error) {
+      console.warn("No fue posible consultar OSM, usando data offline", error);
+      inMemoryCacheRef.current[layer.id] = schools;
+      saveLayerLocalCache(layer.id, schools);
+      return schools;
     }
   };
 
   const fetchData = async (layer: LayerItem) => {
     if (!map) return;
 
-    let data: SchoolsFeatureCollection;
-
-    try {
-      const onlineData = await getSchoolsOSM();
-      data = onlineData.features.length > 0 ? onlineData : schools;
-
-      if (onlineData.features.length === 0) {
-        console.warn("OSM sin resultados, usando data offline");
-      }
-    } catch (error) {
-      console.warn("No fue posible consultar OSM, usando data offline", error);
-      data = schools;
-    }
-
     const sourceId = getSourceId(layer.id);
     const circleId = getCircleId(layer.id);
+    const data = await resolveLayerData(layer);
 
     if (!map.getSource(sourceId)) {
       map.addSource(sourceId, {
@@ -104,7 +205,13 @@ export default function LayerManager({ map }: Props) {
           .setHTML(`<b>${featureName}</b>`)
           .addTo(map);
       });
+    } else {
+      map.setPaintProperty(circleId, "circle-opacity", layer.opacity);
     }
+
+    if (!map.getLayer(circleId)) return;
+
+    setLayerVisibility(layer.id, true);
   };
 
   const toggleLayer = async (layerId: string) => {
@@ -117,7 +224,7 @@ export default function LayerManager({ map }: Props) {
       if (newVisible) {
         await fetchData(targetLayer);
       } else {
-        removeLayerFromMap(layerId);
+        setLayerVisibility(layerId, false);
       }
     }
 
