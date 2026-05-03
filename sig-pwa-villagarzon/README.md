@@ -13,6 +13,28 @@ The React Compiler is enabled on this template. See [this documentation](https:/
 
 Note: This will impact Vite dev & build performances.
 
+## Ajustes funcionales recientes (Visor)
+
+Se implementaron mejoras en la gestion de detalles de features para mantener componentes desacoplados y mejorar la experiencia en mapa:
+
+- `FeatureDetailsPanel` ahora es arrastrable (drag and drop) desde su cabecera.
+- `FeatureDetailsPanel` maneja internamente estado de minimizar/expandir y cierre.
+- `FeatureDetailsPanel` se renderiza en `MapView` para flotar sobre todo el mapa, no dentro del contenedor de `LayerManager`.
+- `LayerManager` ahora solo emite el feature seleccionado mediante `onFeatureDetailsChange`, quedando independiente de la UI de detalles.
+- Al cerrar o remover el popup de MapLibre (incluyendo click fuera), tambien se cierra el panel de detalles.
+- El panel de detalles incluye un espacio preparado para imagen (`imageUrl`) con placeholder cuando aun no hay foto.
+
+### Contrato de comunicacion
+
+`LayerManager` y `MapView` se comunican con el tipo `FeatureDetailsData` definido en `src/utils/interfaces.ts`:
+
+- `featureName: string`
+- `lat: number`
+- `lon: number`
+- `imageUrl?: string`
+
+`LayerManager` invoca `onFeatureDetailsChange(details)` para abrir/actualizar detalles y `onFeatureDetailsChange(null)` para cerrarlos.
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:

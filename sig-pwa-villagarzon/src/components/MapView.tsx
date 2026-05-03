@@ -12,6 +12,8 @@ import MapHeader from "./mapHeader/MapHeader";
 import MapControls from "./mapControls/MapControls";
 // import LayerTableOfContents from "./layerTableOfContents/LayerTableOfContents";
 import LayerManager from "./layerManager/LayerManager";
+import FeatureDetailsPanel from "./layerManager/FeatureDetailsPanel";
+import type { FeatureDetailsData } from "../utils/interfaces";
 
 
 const MapView = () => {
@@ -28,6 +30,8 @@ const MapView = () => {
 
   const [epsg3116, set3116] = useState([0, 0]);
   const [epsg9377, set9377] = useState([0, 0]);
+  const [selectedFeatureDetails, setSelectedFeatureDetails] =
+    useState<FeatureDetailsData | null>(null);
 
   useEffect(() => {
     /* alert(`Este visor es una versión de prueba y está en desarrollo. Algunas funcionalidades pueden no estar disponibles o no funcionar correctamente. ¡Gracias por tu comprensión!
@@ -90,7 +94,16 @@ const MapView = () => {
         <ScaleBar map={mapRef.current} />
         <ScaleControl map={mapRef.current} />
         {/* <LayerTableOfContents map={mapRef.current} /> */}
-        <LayerManager map={mapRef.current}/>
+        <LayerManager
+          map={mapRef.current}
+          onFeatureDetailsChange={setSelectedFeatureDetails}
+        />
+        {selectedFeatureDetails && (
+          <FeatureDetailsPanel
+            details={selectedFeatureDetails}
+            onClose={() => setSelectedFeatureDetails(null)}
+          />
+        )}
         <div
           ref={mapContainer}
           style={{ width: "100%", height: "100vh" }}

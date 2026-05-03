@@ -1,9 +1,7 @@
 .feature-details-panel {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
-  z-index: 12;
+  position: fixed;
+  width: min(360px, calc(100vw - 24px));
+  z-index: 1400;
   background: #ffffff;
   border: 1px solid #dbeafe;
   border-radius: 12px;
@@ -12,8 +10,7 @@
 }
 
 .feature-details-panel--minimized {
-  right: auto;
-  min-width: 220px;
+  width: 240px;
 }
 
 .feature-details-panel__header {
@@ -24,6 +21,8 @@
   padding: 10px 12px;
   background: #eff6ff;
   border-bottom: 1px solid #dbeafe;
+  cursor: grab;
+  user-select: none;
 }
 
 .feature-details-panel__title {

@@ -1,35 +1,73 @@
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
+import type { FeatureDetailsData } from "../../utils/interfaces";
 import "./FeatureDetailsPanel.css";
 
-type SelectedFeatureDetails = {
-  featureName: string;
-  lat: number;
-  lon: number;
-  imageUrl?: string;
-};
-
 type FeatureDetailsPanelProps = {
-  details: SelectedFeatureDetails;
-  minimized: boolean;
-  onToggleMinimize: () => void;
+  details: FeatureDetailsData;
   onClose: () => void;
 };
 
 export default function FeatureDetailsPanel({
   details,
-  minimized,
-  onToggleMinimize,
   onClose,
 }: FeatureDetailsPanelProps) {
+  const [minimized, setMinimized] = useState(false);
+  const [position, setPosition] = useState({ x: 20, y: 100 });
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
+
+  useEffect(() => {
+    setMinimized(false);
+  }, [details]);
+
+  useEffect(() => {
+    const handleMouseMove = (event: globalThis.MouseEvent) => {
+      if (!isDraggingRef.current) return;
+
+      const nextX = event.clientX - dragOffsetRef.current.x;
+      const nextY = event.clientY - dragOffsetRef.current.y;
+      setPosition({ x: Math.max(8, nextX), y: Math.max(8, nextY) });
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
+  const startDragging = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest("button")) return;
+
+    isDraggingRef.current = true;
+    dragOffsetRef.current = {
+      x: event.clientX - position.x,
+      y: event.clientY - position.y,
+    };
+  };
+
   return (
-    <div className={`feature-details-panel${minimized ? " feature-details-panel--minimized" : ""}`}>
-      <div className="feature-details-panel__header">
+    <div
+      className={`feature-details-panel${minimized ? " feature-details-panel--minimized" : ""}`}
+      style={{ left: `${position.x}px`, top: `${position.y}px` }}
+    >
+      <div
+        className="feature-details-panel__header"
+        onMouseDown={startDragging}
+      >
         <strong className="feature-details-panel__title">Detalles del feature</strong>
 
         <div className="feature-details-panel__actions">
           <button
             type="button"
             className="feature-details-panel__btn"
-            onClick={onToggleMinimize}
+            onClick={() => setMinimized((prev) => !prev)}
           >
             {minimized ? "Expandir" : "Minimizar"}
           </button>

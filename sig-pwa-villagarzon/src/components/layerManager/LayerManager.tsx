@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
-import type { Props } from "../../utils/interfaces";
+import type { FeatureDetailsData, Props } from "../../utils/interfaces";
 import maplibregl from "maplibre-gl";
 import { getSchoolsOSM } from "../../services/osmService";
-import FeatureDetailsPanel from "./FeatureDetailsPanel";
 import LayerLoading from "./LayerLoading";
 import "./LayerManager.css";
 
@@ -32,19 +31,9 @@ type LayerItem = {
   opacity: number;
 };
 
-type SelectedFeatureDetails = {
-  featureName: string;
-  lat: number;
-  lon: number;
-  imageUrl?: string;
-};
-
-export default function LayerManager({ map }: Props) {
+export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
   const [expanded, setExpanded] = useState(true);
   const [loadingLayerId, setLoadingLayerId] = useState<string | null>(null);
-  const [selectedFeatureDetails, setSelectedFeatureDetails] =
-    useState<SelectedFeatureDetails | null>(null);
-  const [isDetailsMinimized, setIsDetailsMinimized] = useState(false);
   const inMemoryCacheRef = useRef<Record<string, SchoolsFeatureCollection>>({});
   const popupRef = useRef<maplibregl.Popup | null>(null);
 
@@ -149,17 +138,16 @@ export default function LayerManager({ map }: Props) {
   useEffect(() => {
     return () => {
       popupRef.current?.remove();
+      onFeatureDetailsChange?.(null);
     };
-  }, []);
+  }, [onFeatureDetailsChange]);
 
-  const openFeatureDetails = (details: SelectedFeatureDetails) => {
-    setSelectedFeatureDetails(details);
-    setIsDetailsMinimized(false);
+  const openFeatureDetails = (details: FeatureDetailsData) => {
+    onFeatureDetailsChange?.(details);
   };
 
   const closeFeatureDetails = () => {
-    setSelectedFeatureDetails(null);
-    setIsDetailsMinimized(false);
+    onFeatureDetailsChange?.(null);
   };
 
   const resolveLayerData = async (layer: LayerItem): Promise<SchoolsFeatureCollection> => {
@@ -234,7 +222,7 @@ export default function LayerManager({ map }: Props) {
           (f.properties as { nombre?: string })?.nombre || "Sin nombre",
         );
 
-        const detailsData: SelectedFeatureDetails = {
+        const detailsData: FeatureDetailsData = {
           featureName,
           lon,
           lat,
@@ -293,6 +281,8 @@ export default function LayerManager({ map }: Props) {
         await fetchData(targetLayer);
       } else {
         setLayerVisibility(layerId, false);
+        popupRef.current?.remove();
+        closeFeatureDetails();
       }
     }
 
@@ -356,15 +346,6 @@ export default function LayerManager({ map }: Props) {
 
   return (
     <div className="layer-manager">
-      {selectedFeatureDetails && (
-        <FeatureDetailsPanel
-          details={selectedFeatureDetails}
-          minimized={isDetailsMinimized}
-          onToggleMinimize={() => setIsDetailsMinimized((prev) => !prev)}
-          onClose={closeFeatureDetails}
-        />
-      )}
-
       {loadingLayer && (
         <LayerLoading layerName={loadingLayer.name} />
       )}
