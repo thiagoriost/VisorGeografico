@@ -1,25 +1,967 @@
 {
   "type": "FeatureCollection",
   "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "nombre": "Nuestra Señora del Pilar"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [-76.6177, 1.0339]
-      }
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Alto Eslabon"
     },
-    {
-      "type": "Feature",
-      "properties": {
-        "nombre": "Villa Amazónica"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [-76.66881, 0.96503]
-      }
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6450555,
+        1.0479717
+      ]
     }
-  ]
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Alto Eslabon"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6450055,
+        1.0479917
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela El Guineo"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6521158,
+        1.0146515
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Uchupayaco"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5739332,
+        0.9156306
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Uchupayaco"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5749732,
+        0.9156306
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela La Mina"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5642129,
+        0.8827904
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Canangucho"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.597644,
+        0.962341
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Canangucho"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.597984,
+        0.962471
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela San fidel"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6478141,
+        0.8443307
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5732637,
+        0.9037725
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix Juanambu"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6098214,
+        0.9467976
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix La Esperanza"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.66,
+        1.028056
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix Sinai Vides"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.715833,
+        0.865833
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Canangucho"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.598333,
+        0.961667
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta La Mariposa"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5527778,
+        0.8625
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Francisco de Paula Santander"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.765,
+        0.791389
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "OTRA-SIGLA LA CEIBA"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.729538,
+        0.84774
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Islandia"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.60945,
+        1.033821
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta El Carmen"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.692222,
+        0.993611
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta El Paraiso"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.637778,
+        0.829167
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Colegio Rural Guillermo Valencia"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.608333,
+        0.994167
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix San Vicente del Palmar"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.600881,
+        0.829263
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "OTRA-SIGLA CARITAS FELICES"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6163467,
+        1.0322106
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Río Blanco"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5383333,
+        0.8380556
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix La S Minas"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.564444,
+        0.883333
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix La Paz"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.587765,
+        0.923689
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Alto Mecaya"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.532222,
+        0.935278
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix Alto San Juan"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.795,
+        0.802778
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Urb Mix Cristo Rey"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6211111,
+        1.0233333
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix Santa Teresa"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.708339,
+        0.882456
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix El Naranjito"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.566389,
+        0.816111
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta La Florida"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.492222,
+        0.815
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Brisas de San Vicente"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.655556,
+        0.905278
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Alto Vides"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.769167,
+        0.895278
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Urb Mix Julio Garzon Moreno"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6219698,
+        1.0313339
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Las Playas"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.514167,
+        0.804444
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta La Cafelina"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.617778,
+        0.973889
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix Alto Sinai"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.53,
+        0.8205556
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Campo Alegre"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5754301,
+        0.8758908
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Morelia"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.654444,
+        0.838056
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Jerusalen"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5225,
+        0.8725
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "JARDIN INFANTIL LA CASITA DE MIS SUEÑOS"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6206014,
+        1.029138
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix San Fidel"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.648016,
+        0.844163
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Liceo Pto Umbria"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.576944,
+        0.861944
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix La Palestina"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.606667,
+        0.9225
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Playa Larga"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.711389,
+        0.8375
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix Villa Santa Ana"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.661389,
+        0.988333
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Colegio Urbano Guillermo Valencia"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6130556,
+        1.0272222
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta San Miguel de la Castellana"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.674932,
+        0.890057
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta San Isidro"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5619444,
+        0.9616667
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta María Auxiliadora"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6121809,
+        1.004099
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Albania"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.610762,
+        0.810166
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Oroyaco"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.568056,
+        0.906667
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Sede Educ La Rupasca"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.710833,
+        0.899444
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "ESCUELA RUR NMIX LA CABAÑA"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.650464,
+        0.879481
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Institución Educativa Placido Camilo Crous"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.4922222,
+        0.815
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Alemania"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.566782,
+        0.946115
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Simon Bolívar"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.578333,
+        0.831667
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Siloe Vides"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.7277156,
+        0.8193786
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "OTRA-SIGLA NUEVA ESPERANZA"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6165495,
+        1.0058711
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Centro Educativo Cent de Educ Bas Santa Juliana"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.652222,
+        1.015833
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta El Desierto"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.552778,
+        0.8625
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix Villa Luz"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6633333,
+        0.8575
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix Villarica"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.668809,
+        0.96503
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Kofania"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6896821,
+        0.9368092
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "INSTITUCION EDUCATIVA NUESTRA SEÑORA DEL PILAR"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6163889,
+        1.0336111
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta Champgnath"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.563876,
+        0.960781
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta San José del Guineo"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.619444,
+        0.926389
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix La Betulia"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.7302778,
+        0.8855556
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mix La Pradera"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.743333,
+        0.858333
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta La Gaitana"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.718889,
+        0.931111
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Escuela Rural Mixta El Progreso"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.772778,
+        0.804167
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Centro Educativo Silvio Romo Caicedo"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.6158333,
+        1.0325
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "nombre": "Institución Educativa Rural Puerto Umbria"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -76.5792804,
+        0.8596807
+      ]
+    }
+  }
+]
 }

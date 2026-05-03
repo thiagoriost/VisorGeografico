@@ -1,11 +1,16 @@
  
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
 import type { Props } from "../../utils/interfaces";
 import maplibregl from "maplibre-gl";
 import { getSchoolsOSM } from "../../services/osmService";
 
-const schools = JSON.parse(schoolsRaw);
+type SchoolsFeatureCollection = GeoJSON.FeatureCollection<
+  GeoJSON.Point,
+  { nombre: string }
+>;
+
+const schools = JSON.parse(schoolsRaw) as SchoolsFeatureCollection;
 
 export default function LayerManager({ map }: Props) {
   const [expanded, setExpanded] = useState(true);
@@ -85,7 +90,7 @@ export default function LayerManager({ map }: Props) {
     setLayers(updated);
   };
 
-  const updateOpacity = (layerId: string, opacity: number) => {
+  /* const updateOpacity = (layerId: string, opacity: number) => {
     setLayers((prev) =>
       prev.map((layer) => {
         if (layer.id === layerId) {
@@ -132,11 +137,24 @@ export default function LayerManager({ map }: Props) {
     ];
 
     setLayers(reordered);
-  };
+  }; */
 
   const fetchData = async () => {
     if (map) {
-      const data = await getSchoolsOSM();
+      let data: SchoolsFeatureCollection;
+
+      try {
+        const onlineData = await getSchoolsOSM();
+        data = onlineData.features.length > 0 ? onlineData : schools;
+
+        if (onlineData.features.length === 0) {
+          console.warn("OSM sin resultados, usando data offline");
+        }
+      } catch (error) {
+        console.warn("No fue posible consultar OSM, usando data offline", error);
+        data = schools;
+      }
+
       if (data) {
         map.addSource(
           "osm-schools",
@@ -168,14 +186,20 @@ export default function LayerManager({ map }: Props) {
             }
           )
           const f=e.features?.[0];
-          new maplibregl.Popup().setLngLat(f.geometry.coordinates).setHTML(`<b>${f.properties.name}</b>`).addTo(map)
+          if (!f || f.geometry.type !== "Point") return;
+
+          const [lon, lat] = f.geometry.coordinates as [number, number];
+          const featureName = String((f.properties as { nombre?: string })?.nombre || "Sin nombre");
+
+          new maplibregl.Popup()
+            .setLngLat([lon, lat])
+            .setHTML(`<b>${featureName}</b>`)
+            .addTo(map)
         });        
       }
     }
   };
-  useEffect(() => {
-    // fetchData();
-  }, [map])
+  
 
   return (
     <div
@@ -271,12 +295,12 @@ export default function LayerManager({ map }: Props) {
                         color: "#64748b",
                       }}
                     >
-                      ● Puntos azules
+                      ● Centros educativos en Villagarzón
                     </div>
                   </div>
                 </div>
 
-                <div
+                {/* <div
                   style={{
                     display: "flex",
                     gap: "4px",
@@ -292,12 +316,12 @@ export default function LayerManager({ map }: Props) {
                   >
                     ↓
                   </button>
-                </div>
+                </div> */}
               </div>
 
               {/* TRANSPARENCIA */}
 
-              <div
+              {/* <div
                 style={{
                   marginTop: "10px",
                 }}
@@ -324,7 +348,7 @@ export default function LayerManager({ map }: Props) {
                     width: "100%",
                   }}
                 />
-              </div>
+              </div> */}
             </div>
           ))}
         </div>
@@ -333,10 +357,10 @@ export default function LayerManager({ map }: Props) {
   );
 }
 
-const iconBtn = {
+/* const iconBtn = {
   border: "none",
   background: "#e2e8f0",
   borderRadius: "6px",
   cursor: "pointer",
   padding: "4px 7px",
-};
+}; */

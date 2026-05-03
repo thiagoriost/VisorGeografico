@@ -19,7 +19,27 @@ type OsmElement = {
     };
 };
 
-export async function getSchoolsOSM() {
+type OverpassResponse = {
+    elements: OsmElement[];
+};
+
+type SchoolFeature = {
+    type: "Feature";
+    properties: {
+        nombre: string;
+    };
+    geometry: {
+        type: "Point";
+        coordinates: [number, number];
+    };
+};
+
+type SchoolsFeatureCollection = GeoJSON.FeatureCollection<
+    GeoJSON.Point,
+    { nombre: string }
+>;
+
+export async function getSchoolsOSM(): Promise<SchoolsFeatureCollection> {
 
     const query = `
         [out:json][timeout:25];
@@ -43,27 +63,36 @@ export async function getSchoolsOSM() {
         }
     );
 
-    const data = await response.json();
+    const data: OverpassResponse = await response.json();
 
-    return {
-        type: "FeatureCollection",
-        features: data.elements.map((item: OsmElement) => {
-            console.log({ item })
-            const lon = item.lon || item.center?.lon;
-            const lat = item.lat || item.center?.lat;
+    const features: SchoolFeature[] = data.elements
+        .map((item): SchoolFeature | null => {
+            const lon = item.lon ?? item.center?.lon;
+            const lat = item.lat ?? item.center?.lat;
+
+            if (lon === undefined || lat === undefined) {
+                return null;
+            }
 
             return {
                 type: "Feature",
                 properties: {
-                    name: item.tags?.name || "Sin nombre"
+                    nombre: item.tags?.name || "Sin nombre"
                 },
                 geometry: {
                     type: "Point",
                     coordinates: [lon, lat]
                 }
-            }
-
+            };
         })
+        .filter((feature): feature is SchoolFeature => feature !== null);
+
+    // Copia este log para hardcodear los datos offline en un .geojson.
+    // console.log("offlineSchoolsFeatures", JSON.stringify(features, null, 2));
+
+    return {
+        type: "FeatureCollection",
+        features
     };
 
 }
