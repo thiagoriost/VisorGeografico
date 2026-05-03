@@ -1,12 +1,11 @@
  
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
 import type { Props } from "../../utils/interfaces";
 import maplibregl from "maplibre-gl";
+import { getSchoolsOSM } from "../../services/osmService";
 
 const schools = JSON.parse(schoolsRaw);
-
-
 
 export default function LayerManager({ map }: Props) {
   const [expanded, setExpanded] = useState(true);
@@ -21,15 +20,16 @@ export default function LayerManager({ map }: Props) {
   ]);
 
   const toggleLayer = (layerId: string) => {
-    const updated = layers.map((layer) => {
+    const updated = layers.map(async (layer) => {
       if (layer.id === layerId) {
         const newVisible = !layer.visible;
 
         if (newVisible && map) {
           if (!map.getSource(layer.id)) {
-            map.addSource(layer.id, {
+            /* map.addSource(layer.id, {
               type: "geojson",
-              data: schools,
+              // data: schools,
+              data: await getSchoolsOSM(),
             });
 
             map.addLayer({
@@ -43,7 +43,8 @@ export default function LayerManager({ map }: Props) {
                 "circle-stroke-width": 1.5,
                 "circle-stroke-color": "white",
               },
-            });
+            }); */
+            fetchData()
           }          
         } else if(map){
           if (map.getLayer(`${layer.id}-circle`))
@@ -53,17 +54,23 @@ export default function LayerManager({ map }: Props) {
         }
 
         if (map) {
-          map.on("click","schools-circle",(e: { features: any[]; })=>{
-                  console.log({e})
-                  const feature=e.features[0];
+          map.on("click","schools-circle",(e)=>{
+              console.log({e})
+              const feature=e.features?.[0];
+              if (!feature) return;
+              
+              const geometry = feature.geometry as GeoJSON.Point;
+              if (geometry.type !== "Point" || !geometry.coordinates) return;
+      
+              new maplibregl.Popup()
+              .setLngLat(geometry.coordinates as [number, number])
+              .setHTML(
+              feature.properties.nombre
+              )
+              .addTo(map);
+          });
+
           
-                  new maplibregl.Popup()
-                  .setLngLat(feature.geometry.coordinates)
-                  .setHTML(
-                  feature.properties.nombre
-                  )
-                  .addTo(map);
-              });
         }
 
         return {
@@ -126,6 +133,49 @@ export default function LayerManager({ map }: Props) {
 
     setLayers(reordered);
   };
+
+  const fetchData = async () => {
+    if (map) {
+      const data = await getSchoolsOSM();
+      if (data) {
+        map.addSource(
+          "osm-schools",
+          {
+            type: "geojson",
+            data
+          }
+        );
+  
+        map.addLayer({
+          id: "osm-schools",
+          type: "circle",
+          source: "osm-schools",
+          paint: {
+            "circle-radius": 6,
+            "circle-color": "#2563eb",
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "white"
+          }
+        });
+  
+        map.on( "click", "osm-schools", (e)=>{
+          console.log(
+            {
+              puntoSelected: e.features?.[0],
+              lngLat: e.lngLat,
+              point: e.point,
+  
+            }
+          )
+          const f=e.features?.[0];
+          new maplibregl.Popup().setLngLat(f.geometry.coordinates).setHTML(`<b>${f.properties.name}</b>`).addTo(map)
+        });        
+      }
+    }
+  };
+  useEffect(() => {
+    // fetchData();
+  }, [map])
 
   return (
     <div
