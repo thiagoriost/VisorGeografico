@@ -1,9 +1,9 @@
- 
 import { useState } from "react";
 import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
 import type { Props } from "../../utils/interfaces";
 import maplibregl from "maplibre-gl";
 import { getSchoolsOSM } from "../../services/osmService";
+import "./LayerManager.css";
 
 type SchoolsFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.Point,
@@ -12,10 +12,17 @@ type SchoolsFeatureCollection = GeoJSON.FeatureCollection<
 
 const schools = JSON.parse(schoolsRaw) as SchoolsFeatureCollection;
 
+type LayerItem = {
+  id: string;
+  name: string;
+  visible: boolean;
+  opacity: number;
+};
+
 export default function LayerManager({ map }: Props) {
   const [expanded, setExpanded] = useState(true);
 
-  const [layers, setLayers] = useState([
+  const [layers, setLayers] = useState<LayerItem[]>([
     {
       id: "schools",
       name: "Centros educativos",
@@ -24,70 +31,101 @@ export default function LayerManager({ map }: Props) {
     },
   ]);
 
-  const toggleLayer = (layerId: string) => {
-    const updated = layers.map(async (layer) => {
-      if (layer.id === layerId) {
-        const newVisible = !layer.visible;
+  const getSourceId = (layerId: string) => `${layerId}-source`;
+  const getCircleId = (layerId: string) => `${layerId}-circle`;
 
-        if (newVisible && map) {
-          if (!map.getSource(layer.id)) {
-            /* map.addSource(layer.id, {
-              type: "geojson",
-              // data: schools,
-              data: await getSchoolsOSM(),
-            });
+  const removeLayerFromMap = (layerId: string) => {
+    if (!map) return;
 
-            map.addLayer({
-              id: `${layer.id}-circle`,
-              type: "circle",
-              source: layer.id,
-              paint: {
-                "circle-radius": 7,
-                "circle-color": "#2563eb",
-                "circle-opacity": layer.opacity,
-                "circle-stroke-width": 1.5,
-                "circle-stroke-color": "white",
-              },
-            }); */
-            fetchData()
-          }          
-        } else if(map){
-          if (map.getLayer(`${layer.id}-circle`))
-            map.removeLayer(`${layer.id}-circle`);
+    const sourceId = getSourceId(layerId);
+    const circleId = getCircleId(layerId);
 
-          if (map.getSource(layer.id)) map.removeSource(layer.id);
-        }
+    if (map.getLayer(circleId)) {
+      map.removeLayer(circleId);
+    }
 
-        if (map) {
-          map.on("click","schools-circle",(e)=>{
-              console.log({e})
-              const feature=e.features?.[0];
-              if (!feature) return;
-              
-              const geometry = feature.geometry as GeoJSON.Point;
-              if (geometry.type !== "Point" || !geometry.coordinates) return;
-      
-              new maplibregl.Popup()
-              .setLngLat(geometry.coordinates as [number, number])
-              .setHTML(
-              feature.properties.nombre
-              )
-              .addTo(map);
-          });
+    if (map.getSource(sourceId)) {
+      map.removeSource(sourceId);
+    }
+  };
 
-          
-        }
+  const fetchData = async (layer: LayerItem) => {
+    if (!map) return;
 
-        return {
-          ...layer,
-          visible: newVisible,
-        };
+    let data: SchoolsFeatureCollection;
+
+    try {
+      const onlineData = await getSchoolsOSM();
+      data = onlineData.features.length > 0 ? onlineData : schools;
+
+      if (onlineData.features.length === 0) {
+        console.warn("OSM sin resultados, usando data offline");
       }
+    } catch (error) {
+      console.warn("No fue posible consultar OSM, usando data offline", error);
+      data = schools;
+    }
 
-      return layer;
-    });
+    const sourceId = getSourceId(layer.id);
+    const circleId = getCircleId(layer.id);
 
-    setLayers(updated);
+    if (!map.getSource(sourceId)) {
+      map.addSource(sourceId, {
+        type: "geojson",
+        data,
+      });
+    }
+
+    if (!map.getLayer(circleId)) {
+      map.addLayer({
+        id: circleId,
+        type: "circle",
+        source: sourceId,
+        paint: {
+          "circle-radius": 6,
+          "circle-color": "#2563eb",
+          "circle-opacity": layer.opacity,
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "white",
+        },
+      });
+
+      map.on("click", circleId, (e) => {
+        const f = e.features?.[0];
+        if (!f || f.geometry.type !== "Point") return;
+
+        const [lon, lat] = f.geometry.coordinates as [number, number];
+        const featureName = String(
+          (f.properties as { nombre?: string })?.nombre || "Sin nombre",
+        );
+
+        new maplibregl.Popup()
+          .setLngLat([lon, lat])
+          .setHTML(`<b>${featureName}</b>`)
+          .addTo(map);
+      });
+    }
+  };
+
+  const toggleLayer = async (layerId: string) => {
+    const targetLayer = layers.find((layer) => layer.id === layerId);
+    if (!targetLayer) return;
+
+    const newVisible = !targetLayer.visible;
+
+    if (map) {
+      if (newVisible) {
+        await fetchData(targetLayer);
+      } else {
+        removeLayerFromMap(layerId);
+      }
+    }
+
+    setLayers((prev) =>
+      prev.map((layer) =>
+        layer.id === layerId ? { ...layer, visible: newVisible } : layer,
+      ),
+    );
   };
 
   /* const updateOpacity = (layerId: string, opacity: number) => {
@@ -139,147 +177,33 @@ export default function LayerManager({ map }: Props) {
     setLayers(reordered);
   }; */
 
-  const fetchData = async () => {
-    if (map) {
-      let data: SchoolsFeatureCollection;
-
-      try {
-        const onlineData = await getSchoolsOSM();
-        data = onlineData.features.length > 0 ? onlineData : schools;
-
-        if (onlineData.features.length === 0) {
-          console.warn("OSM sin resultados, usando data offline");
-        }
-      } catch (error) {
-        console.warn("No fue posible consultar OSM, usando data offline", error);
-        data = schools;
-      }
-
-      if (data) {
-        map.addSource(
-          "osm-schools",
-          {
-            type: "geojson",
-            data
-          }
-        );
-  
-        map.addLayer({
-          id: "osm-schools",
-          type: "circle",
-          source: "osm-schools",
-          paint: {
-            "circle-radius": 6,
-            "circle-color": "#2563eb",
-            "circle-stroke-width": 1,
-            "circle-stroke-color": "white"
-          }
-        });
-  
-        map.on( "click", "osm-schools", (e)=>{
-          console.log(
-            {
-              puntoSelected: e.features?.[0],
-              lngLat: e.lngLat,
-              point: e.point,
-  
-            }
-          )
-          const f=e.features?.[0];
-          if (!f || f.geometry.type !== "Point") return;
-
-          const [lon, lat] = f.geometry.coordinates as [number, number];
-          const featureName = String((f.properties as { nombre?: string })?.nombre || "Sin nombre");
-
-          new maplibregl.Popup()
-            .setLngLat([lon, lat])
-            .setHTML(`<b>${featureName}</b>`)
-            .addTo(map)
-        });        
-      }
-    }
-  };
-  
-
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 90,
-        right: 18,
-        width: "320px",
-        zIndex: 1200,
-        background: "rgba(255,255,255,.95)",
-        backdropFilter: "blur(10px)",
-        borderRadius: "16px",
-        boxShadow: "0 8px 24px rgba(0,0,0,.14)",
-        overflow: "hidden",
-      }}
-    >
+    <div className="layer-manager">
       {/* HEADER */}
 
-      <div
-        style={{
-          padding: "14px 16px",
-          display: "flex",
-          justifyContent: "space-between",
-          fontWeight: 600,
-          borderBottom: "1px solid #e5e7eb",
-        }}
-      >
+      <div className="layer-manager__header">
         <span>Contenido</span>
 
         <button
           onClick={() => setExpanded(!expanded)}
-          style={{
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-          }}
+          className="layer-manager__toggle-btn"
         >
           {expanded ? "▾" : "▸"}
         </button>
       </div>
 
       {expanded && (
-        <div style={{ padding: "10px" }}>
+        <div className="layer-manager__body">
           {/* GROUP */}
 
-          <div
-            style={{
-              fontSize: "13px",
-              fontWeight: 600,
-              marginBottom: "8px",
-              color: "#475569",
-            }}
-          >
+          <div className="layer-manager__group-title">
             Educación
           </div>
 
           {layers.map((layer) => (
-            <div
-              key={layer.id}
-              style={{
-                background: "#f8fafc",
-                borderRadius: "12px",
-                padding: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                  }}
-                >
+            <div key={layer.id} className="layer-manager__card">
+              <div className="layer-manager__row">
+                <div className="layer-manager__left">
                   <input
                     type="checkbox"
                     checked={layer.visible}
@@ -290,10 +214,7 @@ export default function LayerManager({ map }: Props) {
                     <div>{layer.name}</div>
 
                     <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#64748b",
-                      }}
+                      className="layer-manager__description"
                     >
                       ● Centros educativos en Villagarzón
                     </div>
