@@ -3,6 +3,7 @@ import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
 import type { Props } from "../../utils/interfaces";
 import maplibregl from "maplibre-gl";
 import { getSchoolsOSM } from "../../services/osmService";
+import LayerLoading from "./LayerLoading";
 import "./LayerManager.css";
 
 type SchoolsFeatureCollection = GeoJSON.FeatureCollection<
@@ -32,6 +33,7 @@ type LayerItem = {
 
 export default function LayerManager({ map }: Props) {
   const [expanded, setExpanded] = useState(true);
+  const [loadingLayerId, setLoadingLayerId] = useState<string | null>(null);
   const inMemoryCacheRef = useRef<Record<string, SchoolsFeatureCollection>>({});
 
   const [layers, setLayers] = useState<LayerItem[]>([
@@ -144,6 +146,8 @@ export default function LayerManager({ map }: Props) {
       return localCached;
     }
 
+    setLoadingLayerId(layer.id);
+
     try {
       const onlineData = await getSchoolsOSM();
       const selectedData = onlineData.features.length > 0 ? onlineData : schools;
@@ -160,6 +164,8 @@ export default function LayerManager({ map }: Props) {
       inMemoryCacheRef.current[layer.id] = schools;
       saveLayerLocalCache(layer.id, schools);
       return schools;
+    } finally {
+      setLoadingLayerId(null);
     }
   };
 
@@ -202,7 +208,11 @@ export default function LayerManager({ map }: Props) {
 
         new maplibregl.Popup()
           .setLngLat([lon, lat])
-          .setHTML(`<b>${featureName}</b>`)
+          .setHTML(`
+            <b>${featureName}</b>
+            <br/>
+            Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}
+          `)
           .addTo(map);
       });
     } else {
@@ -284,8 +294,14 @@ export default function LayerManager({ map }: Props) {
     setLayers(reordered);
   }; */
 
+  const loadingLayer = layers.find((l) => l.id === loadingLayerId);
+
   return (
     <div className="layer-manager">
+      {loadingLayer && (
+        <LayerLoading layerName={loadingLayer.name} />
+      )}
+
       {/* HEADER */}
 
       <div className="layer-manager__header">
