@@ -31,6 +31,36 @@ type LayerItem = {
   opacity: number;
 };
 
+const LayersIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+    className="layer-manager__floating-icon"
+  >
+    <path
+      d="M12 4L4 8.5L12 13L20 8.5L12 4Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4 12.5L12 17L20 12.5"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4 16.5L12 21L20 16.5"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
   const [expanded, setExpanded] = useState(true);
   const [loadingLayerId, setLoadingLayerId] = useState<string | null>(null);
@@ -343,30 +373,42 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
   }; */
 
   const loadingLayer = layers.find((l) => l.id === loadingLayerId);
+  const panelStateLabel = expanded ? "Minimizar panel de capas" : "Maximizar panel de capas";
 
   return (
-    <div className="layer-manager">
-      {loadingLayer && (
-        <LayerLoading layerName={loadingLayer.name} />
-      )}
+    <div className={`layer-manager-shell ${expanded ? "is-expanded" : "is-collapsed"}`}>
+      <button
+        type="button"
+        className="layer-manager__floating-btn"
+        onClick={() => setExpanded(true)}
+        aria-label="Abrir panel de capas"
+        title="Capas"
+      >
+        <LayersIcon />
+      </button>
 
-      {/* HEADER */}
+      <section className="layer-manager" aria-expanded={expanded}>
+        {loadingLayer && (
+          <LayerLoading layerName={loadingLayer.name} />
+        )}
 
-      <div className="layer-manager__header">
-        <span>Contenido</span>
+        <div className="layer-manager__header">
+          <span className="layer-manager__title">Contenido</span>
 
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="layer-manager__toggle-btn"
-        >
-          {expanded ? "▾" : "▸"}
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => setExpanded(false)}
+            className="layer-manager__toggle-btn"
+            aria-label={panelStateLabel}
+            title={panelStateLabel}
+          >
+            <span className="layer-manager__toggle-chevron" aria-hidden="true">
+              ▾
+            </span>
+          </button>
+        </div>
 
-      {expanded && (
         <div className="layer-manager__body">
-          {/* GROUP */}
-
           <div className="layer-manager__group-title">
             Educación
           </div>
@@ -374,77 +416,38 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
           {layers.map((layer) => (
             <div key={layer.id} className="layer-manager__card">
               <div className="layer-manager__row">
-                <div className="layer-manager__left">
+                <label className="layer-manager__left">
                   <input
                     type="checkbox"
                     checked={layer.visible}
                     onChange={() => toggleLayer(layer.id)}
+                    className="layer-manager__checkbox"
                   />
 
-                  <div>
-                    <div>{layer.name}</div>
+                  <span className="layer-manager__label-wrap">
+                    <span className="layer-manager__layer-name">{layer.name}</span>
 
-                    <div
+                    <span
                       className="layer-manager__description"
                     >
                       ● Centros educativos en Villagarzón
-                    </div>
-                  </div>
-                </div>
-
-                {/* <div
-                  style={{
-                    display: "flex",
-                    gap: "4px",
-                  }}
-                >
-                  <button onClick={() => moveLayerUp(layer.id)} style={iconBtn}>
-                    ↑
-                  </button>
-
-                  <button
-                    onClick={() => moveLayerDown(layer.id)}
-                    style={iconBtn}
-                  >
-                    ↓
-                  </button>
-                </div> */}
+                    </span>
+                  </span>
+                </label>
               </div>
-
-              {/* TRANSPARENCIA */}
-
-              {/* <div
-                style={{
-                  marginTop: "10px",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "11px",
-                    marginBottom: "4px",
-                  }}
-                >
-                  Transparencia
-                </div>
-
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step=".1"
-                  value={layer.opacity}
-                  onChange={(e) =>
-                    updateOpacity(layer.id, Number(e.target.value))
-                  }
-                  style={{
-                    width: "100%",
-                  }}
-                />
-              </div> */}
             </div>
           ))}
         </div>
-      )}
+      </section>
+
+      <button
+        type="button"
+        className="layer-manager__mobile-fab"
+        onClick={() => setExpanded(!expanded)}
+        aria-label={panelStateLabel}
+      >
+        <LayersIcon />
+      </button>
     </div>
   );
 }
