@@ -33,3 +33,37 @@ export const NextIcon = () => (
         <path fill="currentColor" d="M9 6l6 6-6 6"/>
     </svg>
 )
+
+type LayersIconProps = {
+    className?: string;
+}
+
+export const LayersIcon = ({ className }: LayersIconProps) => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+        className={className}
+    >
+        <path
+            d="M12 4L4 8.5L12 13L20 8.5L12 4Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M4 12.5L12 17L20 12.5"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M4 16.5L12 21L20 16.5"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+    </svg>
+)

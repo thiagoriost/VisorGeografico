@@ -3,6 +3,7 @@ import schoolsRaw from "../../data/centrosEducativos.geojson?raw";
 import type { FeatureDetailsData, Props } from "../../utils/interfaces";
 import maplibregl from "maplibre-gl";
 import { getSchoolsOSM } from "../../services/osmService";
+import { LayersIcon } from "../mapControls/Icons";
 import LayerLoading from "./LayerLoading";
 import "./LayerManager.css";
 
@@ -30,36 +31,6 @@ type LayerItem = {
   visible: boolean;
   opacity: number;
 };
-
-const LayersIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-    className="layer-manager__floating-icon"
-  >
-    <path
-      d="M12 4L4 8.5L12 13L20 8.5L12 4Z"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M4 12.5L12 17L20 12.5"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M4 16.5L12 21L20 16.5"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
   const [expanded, setExpanded] = useState(true);
@@ -384,7 +355,7 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
         aria-label="Abrir panel de capas"
         title="Capas"
       >
-        <LayersIcon />
+        <LayersIcon className="layer-manager__floating-icon" />
       </button>
 
       <section className="layer-manager" aria-expanded={expanded}>
@@ -446,7 +417,7 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
         onClick={() => setExpanded(!expanded)}
         aria-label={panelStateLabel}
       >
-        <LayersIcon />
+        <LayersIcon className="layer-manager__floating-icon" />
       </button>
     </div>
   );
