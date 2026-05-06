@@ -1,10 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { Props } from "../../utils/interfaces";
+import "./ScaleBar.css";
 
-const ScaleBar: React.FC<Props> = ({ map }) => {
+/**
+ * Props del componente de barra de escala.
+ */
+interface ScaleBarProps {
+  /** Instancia del mapa para leer centro/zoom y eventos de movimiento. */
+  map: Props["map"];
+}
+
+/**
+ * Barra grafica de escala que se recalcula en cada movimiento del mapa.
+ */
+const ScaleBar: React.FC<ScaleBarProps> = ({ map }) => {
   const [scaleWidth, setScaleWidth] = useState(100);
   const [scaleText, setScaleText] = useState("100 m");
+  const scaleLineRef = useRef<HTMLDivElement | null>(null);
 
+  /**
+   * Calcula y actualiza ancho/etiqueta de la escala en funcion del zoom y latitud.
+   */
   const updateScale = () => {
     if (!map) return;
 
@@ -26,6 +42,9 @@ const ScaleBar: React.FC<Props> = ({ map }) => {
     setScaleText(formatScale(niceScale));
   };
 
+  /**
+   * Normaliza la distancia a valores legibles para la barra grafica.
+   */
   const getNiceScale = (meters: number) => {
     const scales = [
       1, 2, 5,
@@ -43,6 +62,9 @@ const ScaleBar: React.FC<Props> = ({ map }) => {
     return meters;
   };
 
+  /**
+   * Formatea metros a metros o kilometros segun corresponda.
+   */
   const formatScale = (meters: number) => {
     if (meters >= 1000) {
       return `${meters / 1000} km`;
@@ -63,32 +85,20 @@ const ScaleBar: React.FC<Props> = ({ map }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
-  return (
-    <div
-      style={{
-        position: "absolute",
-        bottom: 40,
-        right: 10,
-        zIndex: 1000,
-        background: "rgba(0,0,0,0.7)",
-        color: "white",
-        padding: "8px",
-        borderRadius: "6px"
-      }}
-    >
-      <div
-        style={{
-          width: `${scaleWidth}px`,
-          height: "4px",
-          background: "white",
-          marginBottom: "4px"
-        }}
-      />
+  /**
+   * Aplica el ancho calculado a la barra sin usar estilos inline en JSX.
+   */
+  useEffect(() => {
+    if (!scaleLineRef.current) return;
+    scaleLineRef.current.style.width = `${scaleWidth}px`;
+  }, [scaleWidth]);
 
-      <div style={{ fontSize: "12px" }}>
-        {scaleText}
-      </div>
-    </div>
+  return (
+    <section className="scale-bar" aria-label="Barra de escala">
+      <div ref={scaleLineRef} className="scale-bar__line" />
+
+      <div className="scale-bar__text">{scaleText}</div>
+    </section>
   );
 };
 

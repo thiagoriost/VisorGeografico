@@ -2,23 +2,41 @@ import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 
 import type { FeatureDetailsData } from "../../utils/interfaces";
 import "./FeatureDetailsPanel.css";
 
+/**
+ * Props del panel flotante de detalles de feature.
+ */
 type FeatureDetailsPanelProps = {
+  /** Datos del feature seleccionado. */
   details: FeatureDetailsData;
+  /** Callback para cerrar el panel. */
   onClose: () => void;
 };
 
+/**
+ * Panel draggable con detalle del elemento seleccionado en el mapa.
+ */
 export default function FeatureDetailsPanel({
   details,
   onClose,
 }: FeatureDetailsPanelProps) {
   const [minimized, setMinimized] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 100 });
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
 
   useEffect(() => {
     setMinimized(false);
   }, [details]);
+
+  /**
+   * Aplica la posicion del panel sobre el DOM para evitar estilos inline en JSX.
+   */
+  useEffect(() => {
+    if (!panelRef.current) return;
+    panelRef.current.style.left = `${position.x}px`;
+    panelRef.current.style.top = `${position.y}px`;
+  }, [position]);
 
   useEffect(() => {
     const handleMouseMove = (event: globalThis.MouseEvent) => {
@@ -42,6 +60,9 @@ export default function FeatureDetailsPanel({
     };
   }, []);
 
+  /**
+   * Inicia la interaccion de arrastre cuando se presiona el encabezado.
+   */
   const startDragging = (event: ReactMouseEvent<HTMLDivElement>) => {
     if ((event.target as HTMLElement).closest("button")) return;
 
@@ -54,13 +75,10 @@ export default function FeatureDetailsPanel({
 
   return (
     <div
+      ref={panelRef}
       className={`feature-details-panel${minimized ? " feature-details-panel--minimized" : ""}`}
-      style={{ left: `${position.x}px`, top: `${position.y}px` }}
     >
-      <div
-        className="feature-details-panel__header"
-        onMouseDown={startDragging}
-      >
+      <div className="feature-details-panel__header" onMouseDown={startDragging}>
         <strong className="feature-details-panel__title">Detalles del feature</strong>
 
         <div className="feature-details-panel__actions">
@@ -88,19 +106,19 @@ export default function FeatureDetailsPanel({
           <p className="feature-details-panel__line">Latitud: {details.lat.toFixed(6)}</p>
           <p className="feature-details-panel__line">Longitud: {details.lon.toFixed(6)}</p>
 
-            {details.imageUrl ? (
-                <div className="feature-details-panel__image-wrap">
-                    <img
-                        src={details.imageUrl}
-                        alt={`Imagen de ${details.featureName}`}
-                        className="feature-details-panel__image"
-                    />
-                </div>
-            ) : (
-              <div className="feature-details-panel__image-placeholder">
-                Espacio reservado para imagen del centro educativo
-              </div>
-            )}
+          {details.imageUrl ? (
+            <div className="feature-details-panel__image-wrap">
+              <img
+                src={details.imageUrl}
+                alt={`Imagen de ${details.featureName}`}
+                className="feature-details-panel__image"
+              />
+            </div>
+          ) : (
+            <div className="feature-details-panel__image-placeholder">
+              Espacio reservado para imagen del centro educativo
+            </div>
+          )}
         </div>
       )}
     </div>

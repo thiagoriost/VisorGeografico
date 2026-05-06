@@ -1,0 +1,31 @@
+@import "../../styles/uiPreset.css";
+
+.map-controls {
+  position: absolute;
+  top: 100px;
+  left: var(--ui-space-4);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-2);
+}
+
+.map-controls__item {
+  position: relative;
+}
+
+.map-controls__button {
+  color: var(--ui-color-text);
+}
+
+.map-controls__tooltip {
+  font-family: var(--ui-font-family);
+}
+
+@media (max-width: 640px) {
+  .map-controls {
+    top: 84px;
+    left: var(--ui-space-3);
+    gap: var(--ui-space-1);
+  }
+}

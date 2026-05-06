@@ -4,8 +4,13 @@ Escala gráfica = resolución * anchoPixels
  */
 
 import React, { useState, useEffect } from "react";
+import "./ScaleControl.css";
 
+/**
+ * Props del control de escala numerica del mapa.
+ */
 interface Props {
+  /** Instancia de mapa con metodos minimos para lectura/ajuste de zoom. */
   map: {
     getZoom: () => number;
     zoomTo: (zoom: number) => void;
@@ -20,9 +25,15 @@ const scales = [
   10000000, 50000000, 100000000, 500000000,
 ];
 
+/**
+ * Control flotante para visualizar y ajustar escala nominal mediante zoom.
+ */
 const ScaleControl: React.FC<Props> = ({ map }) => {
   const [scale, setScale] = useState(0);
 
+  /**
+   * Calcula la escala nominal actual del mapa a partir del nivel de zoom.
+   */
   const getScale = () => {
     if (!map) return;
 
@@ -31,6 +42,9 @@ const ScaleControl: React.FC<Props> = ({ map }) => {
     setScale(Math.round(scale));
   };
 
+  /**
+   * Ajusta el zoom del mapa para aproximarse a la escala seleccionada.
+   */
   const setMapScale = (value: number) => {
     if (!map) return;
 
@@ -53,30 +67,15 @@ const ScaleControl: React.FC<Props> = ({ map }) => {
   }, [map]);
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        bottom: 95,
-        right: 10,
-        zIndex: 1000,
-        background: "rgba(0,0,0,0.7)",
-        color: "white",
-        padding: "10px",
-        borderRadius: "6px",
-        fontSize: "12px"
-      }}
-    >
-      <div>Escala 1:{scale.toLocaleString()}</div>
+    <section className="scale-control" aria-label="Control de escala">
+      <div className="scale-control__value">Escala 1:{scale.toLocaleString()}</div>
 
       <select
         value={scales.reduce((prev, curr) =>
           Math.abs(curr - scale) < Math.abs(prev - scale) ? curr : prev
         )}
         onChange={(e) => setMapScale(Number(e.target.value))}
-        style={{
-          width: "150px",
-          marginTop: "5px"
-        }}
+        className="scale-control__select"
       >
         {scales.map((s) => (
           <option key={s} value={s}>
@@ -84,7 +83,7 @@ const ScaleControl: React.FC<Props> = ({ map }) => {
           </option>
         ))}
       </select>
-    </div>
+    </section>
   );
 };
 

@@ -1,0 +1,61 @@
+@import "../../styles/uiPreset.css";
+
+.round-button {
+  position: relative;
+}
+
+.round-button__btn {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--ui-radius-pill);
+  border: 1px solid var(--ui-color-border);
+  background: color-mix(in srgb, var(--ui-color-primary-strong) 74%, transparent);
+  color: var(--ui-color-text);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--ui-shadow-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform var(--ui-transition-fast),
+    background-color var(--ui-transition-fast),
+    box-shadow var(--ui-transition-fast),
+    opacity var(--ui-transition-fast);
+}
+
+.round-button__btn:hover:not(:disabled),
+.round-button__btn:focus-visible:not(:disabled) {
+  transform: translateY(-1px) scale(1.04);
+  background: color-mix(in srgb, var(--ui-color-primary-strong) 94%, transparent);
+  box-shadow: var(--ui-shadow-md);
+}
+
+.round-button__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.round-button__tooltip {
+  position: absolute;
+  left: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: color-mix(in srgb, var(--ui-color-primary-strong) 86%, transparent);
+  color: var(--ui-color-text);
+  border: 1px solid var(--ui-color-border-strong);
+  border-radius: var(--ui-radius-sm);
+  padding: var(--ui-space-1) var(--ui-space-2);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--ui-transition-fast), visibility var(--ui-transition-fast);
+}
+
+.round-button:hover .round-button__tooltip,
+.round-button:focus-within .round-button__tooltip {
+  opacity: 1;
+  visibility: visible;
+}

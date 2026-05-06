@@ -151,6 +151,37 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
     onFeatureDetailsChange?.(null);
   };
 
+  /**
+   * Construye el contenido DOM del popup para un feature puntual.
+   */
+  const createFeaturePopupContent = (
+    detailsData: FeatureDetailsData,
+  ): HTMLDivElement => {
+    const popupContent = document.createElement("div");
+    popupContent.className = "feature-popup";
+
+    const title = document.createElement("p");
+    title.className = "feature-popup__name";
+    title.textContent = detailsData.featureName;
+
+    const coord = document.createElement("p");
+    coord.className = "feature-popup__coords";
+    coord.textContent = `Lat: ${detailsData.lat.toFixed(5)}, Lon: ${detailsData.lon.toFixed(5)}`;
+
+    const detailsButton = document.createElement("button");
+    detailsButton.type = "button";
+    detailsButton.className = "feature-popup__button";
+    detailsButton.textContent = "Ver detalles";
+    detailsButton.ariaLabel = `Ver detalles de ${detailsData.featureName}`;
+    detailsButton.addEventListener("click", () => {
+      openFeatureDetails(detailsData);
+      popupRef.current?.remove();
+    });
+
+    popupContent.append(title, coord, detailsButton);
+    return popupContent;
+  };
+
   const resolveLayerData = async (layer: LayerItem): Promise<SchoolsFeatureCollection> => {
     const memoryCached = inMemoryCacheRef.current[layer.id];
     if (memoryCached) {
@@ -232,26 +263,7 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
         // Al seleccionar otro feature, cerramos cualquier detalle previo.
         closeFeatureDetails();
 
-        const popupContent = document.createElement("div");
-        popupContent.className = "feature-popup";
-
-        const title = document.createElement("p");
-        title.className = "feature-popup__name";
-        title.textContent = featureName;
-
-        const coord = document.createElement("p");
-        coord.className = "feature-popup__coords";
-        coord.textContent = `Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
-
-        const detailsButton = document.createElement("button");
-        detailsButton.type = "button";
-        detailsButton.className = "feature-popup__button";
-        detailsButton.textContent = "Ver detalles";
-        detailsButton.addEventListener("click", () => {
-          openFeatureDetails(detailsData);
-        });
-
-        popupContent.append(title, coord, detailsButton);
+        const popupContent = createFeaturePopupContent(detailsData);
 
         popupRef.current?.remove();
         popupRef.current = new maplibregl.Popup()

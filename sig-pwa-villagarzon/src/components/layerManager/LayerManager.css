@@ -200,6 +200,8 @@
   gap: 6px;
   min-width: 180px;
   font-family: var(--ui-font-family);
+  background: var(--ui-color-surface-strong);
+  color: var(--ui-color-text);
 }
 
 .feature-popup__name {
@@ -219,7 +221,7 @@
   border: 1px solid var(--ui-color-border-strong);
   border-radius: var(--ui-radius-sm);
   background: var(--ui-color-primary-soft);
-  color: var(--ui-color-primary-strong);
+  color: var(--ui-color-text);
   font-size: 0.73rem;
   font-weight: 700;
   cursor: pointer;
@@ -227,7 +229,7 @@
 }
 
 .feature-popup__button:hover {
-  filter: brightness(0.98);
+  filter: brightness(1.08);
 }
 
 @media (max-width: 900px) {

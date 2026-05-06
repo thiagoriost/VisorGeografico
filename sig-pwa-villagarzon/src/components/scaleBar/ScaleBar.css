@@ -1,0 +1,35 @@
+@import "../../styles/uiPreset.css";
+
+.scale-bar {
+  position: absolute;
+  bottom: 40px;
+  right: var(--ui-space-3);
+  z-index: 1000;
+  background: color-mix(in srgb, var(--ui-color-primary-strong) 76%, transparent);
+  color: var(--ui-color-text);
+  border: 1px solid var(--ui-color-border-strong);
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-sm);
+  padding: var(--ui-space-2) var(--ui-space-3);
+  font-family: var(--ui-font-family);
+}
+
+.scale-bar__line {
+  height: 4px;
+  background: var(--ui-color-text);
+  margin-bottom: var(--ui-space-1);
+  min-width: 24px;
+  max-width: 220px;
+}
+
+.scale-bar__text {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .scale-bar {
+    right: var(--ui-space-2);
+    bottom: 84px;
+  }
+}

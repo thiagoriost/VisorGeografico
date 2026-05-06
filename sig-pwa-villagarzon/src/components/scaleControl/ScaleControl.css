@@ -1,0 +1,44 @@
+@import "../../styles/uiPreset.css";
+
+.scale-control {
+  position: absolute;
+  bottom: 95px;
+  right: var(--ui-space-3);
+  z-index: 1000;
+  background: color-mix(in srgb, var(--ui-color-primary-strong) 76%, transparent);
+  color: var(--ui-color-text);
+  border: 1px solid var(--ui-color-border-strong);
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-sm);
+  padding: var(--ui-space-3);
+  font-size: 0.75rem;
+  font-family: var(--ui-font-family);
+  min-width: 170px;
+}
+
+.scale-control__value {
+  font-weight: 700;
+}
+
+.scale-control__select {
+  width: 100%;
+  margin-top: var(--ui-space-2);
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-color-border-strong);
+  background: color-mix(in srgb, var(--ui-color-primary-strong) 82%, transparent);
+  color: var(--ui-color-text);
+  font-size: 0.78rem;
+  padding: 6px var(--ui-space-2);
+}
+
+.scale-control__select:focus-visible {
+  outline: 2px solid var(--ui-color-border-strong);
+  outline-offset: 1px;
+}
+
+@media (max-width: 640px) {
+  .scale-control {
+    right: var(--ui-space-2);
+    bottom: 134px;
+  }
+}

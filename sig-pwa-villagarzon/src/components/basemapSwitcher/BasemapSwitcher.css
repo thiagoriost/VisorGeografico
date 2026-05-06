@@ -1,0 +1,45 @@
+@import "../../styles/uiPreset.css";
+
+.basemap-switcher {
+  position: absolute;
+  top: var(--ui-space-3);
+  right: var(--ui-space-3);
+  z-index: 1000;
+  background: color-mix(in srgb, var(--ui-color-primary-strong) 76%, transparent);
+  color: var(--ui-color-text);
+  border: 1px solid var(--ui-color-border-strong);
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-sm);
+  padding: var(--ui-space-2) var(--ui-space-3);
+  font-family: var(--ui-font-family);
+  min-width: 164px;
+}
+
+.basemap-switcher__title {
+  margin: 0 0 var(--ui-space-2) 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.basemap-switcher__select {
+  width: 100%;
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-color-border-strong);
+  background: color-mix(in srgb, var(--ui-color-primary-strong) 82%, transparent);
+  color: var(--ui-color-text);
+  font-size: 0.8rem;
+  padding: 6px var(--ui-space-2);
+}
+
+.basemap-switcher__select:focus-visible {
+  outline: 2px solid var(--ui-color-border-strong);
+  outline-offset: 1px;
+}
+
+@media (max-width: 640px) {
+  .basemap-switcher {
+    top: 72px;
+    right: var(--ui-space-2);
+    min-width: 144px;
+  }
+}

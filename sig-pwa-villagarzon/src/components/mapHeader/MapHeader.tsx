@@ -1,65 +1,40 @@
 import React from "react";
+import "./MapHeader.css";
 
+/**
+ * Props del encabezado flotante del mapa.
+ */
 interface Props {
+  /** Titulo principal mostrado en el encabezado. */
   title: string;
+  /** Subtitulo opcional con contexto adicional. */
   subtitle?: string;
+  /** URL opcional del logo institucional. */
   logo?: string;
 }
 
+/**
+ * Encabezado visual del mapa con titulo, subtitulo y logo opcional.
+ */
 const MapHeader: React.FC<Props> = ({ title, subtitle, logo }) => {
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 16,
-        left: 16,
-        zIndex: 1000,
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        padding: "10px 14px",
-        borderRadius: "12px",
-        background: "rgba(255,255,255,0.75)",
-        backdropFilter: "blur(8px)",
-        boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
-        border: "1px solid rgba(255,255,255,0.4)"
-      }}
-    >
+    <header className="map-header" aria-label="Encabezado del mapa">
       {logo && (
         <img
           src={logo}
           alt="logo"
-          style={{
-            height: "38px",
-            width: "auto"
-          }}
+          className="map-header__logo"
         />
       )}
 
-      <div>
-        <div
-          style={{
-            fontWeight: 600,
-            fontSize: "15px",
-            color: "#1f2937",
-            lineHeight: "18px"
-          }}
-        >
-          {title}
-        </div>
+      <div className="map-header__content">
+        <div className="map-header__title">{title}</div>
 
         {subtitle && (
-          <div
-            style={{
-              fontSize: "12px",
-              color: "#6b7280"
-            }}
-          >
-            {subtitle}
-          </div>
+          <div className="map-header__subtitle">{subtitle}</div>
         )}
       </div>
-    </div>
+    </header>
   );
 };
 

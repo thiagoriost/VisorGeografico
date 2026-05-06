@@ -1,27 +1,46 @@
 import React, { useState } from "react";
 import "./MapStatusBar.css";
 
+/**
+ * Props de la barra de estado cartografica.
+ */
 interface Props {
+    /** Latitud WGS84 actual del cursor/centro segun origen de datos. */
     lat: number;
+    /** Longitud WGS84 actual del cursor/centro segun origen de datos. */
     lng: number;
+    /** Nivel de zoom actual del mapa. */
     zoom: number;
+    /** Latitud transformada a EPSG:4686. */
     lat4686: number;
+    /** Longitud transformada a EPSG:4686. */
     lng4686: number;
+    /** Coordenadas [X, Y] en EPSG:3116. */
     epsg3116: number[];
+    /** Coordenadas [X, Y] en EPSG:9377. */
     epsg9377: number[];
+    /** Coordenadas UTM [E, N]. */
     utm: number[];
+    /** Zona UTM activa. */
     utmZone: number;
 }
 
+/**
+ * Barra de estado flotante con coordenadas en distintos sistemas de referencia.
+ */
 const MapStatusBar: React.FC<Props> = ({ lat, lng, lat4686, lng4686, zoom, epsg3116, epsg9377, utm, utmZone }) => {
   const [expanded, setExpanded] = useState(false);
+
+  /** Alterna vista resumida y vista detallada de coordenadas. */
+  const toggleExpanded = () => setExpanded((prev) => !prev);
 
   return (
     <div className="map-status-bar">
       <div className="map-status-bar__header">
-        <strong>Coordenadas</strong>
+        <strong className="map-status-bar__title">Coordenadas</strong>
         <button
-          onClick={() => setExpanded(!expanded)}
+          type="button"
+          onClick={toggleExpanded}
           title={expanded ? "Mostrar menos" : "Mostrar más"}
           className="map-status-bar__toggle-btn"
         >
@@ -29,7 +48,7 @@ const MapStatusBar: React.FC<Props> = ({ lat, lng, lat4686, lng4686, zoom, epsg3
         </button>
       </div>
 
-      <div>
+      <div className="map-status-bar__section map-status-bar__section--compact">
         <strong>EPSG:4686</strong>
         <div>Lat: {lat4686.toFixed(6)}</div>
         <div>Lng: {lng4686.toFixed(6)}</div>

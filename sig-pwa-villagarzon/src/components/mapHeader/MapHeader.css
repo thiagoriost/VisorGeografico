@@ -1,0 +1,61 @@
+@import "../../styles/uiPreset.css";
+
+.map-header {
+  position: absolute;
+  top: var(--ui-space-4);
+  left: var(--ui-space-4);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-3);
+  padding: 10px 14px;
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--ui-shadow-md);
+  border: 1px solid var(--ui-color-border);
+  color: var(--ui-color-text);
+  font-family: var(--ui-font-family);
+  max-width: min(70vw, 520px);
+}
+
+.map-header__logo {
+  height: 38px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.map-header__content {
+  min-width: 0;
+}
+
+.map-header__title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ui-color-text);
+  line-height: 1.2;
+}
+
+.map-header__subtitle {
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--ui-color-text-muted);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .map-header {
+    top: var(--ui-space-2);
+    left: var(--ui-space-2);
+    padding: var(--ui-space-2) var(--ui-space-3);
+    gap: var(--ui-space-2);
+    max-width: min(86vw, 420px);
+  }
+
+  .map-header__logo {
+    height: 32px;
+  }
+}

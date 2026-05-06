@@ -3,6 +3,7 @@ import maplibregl, { Marker, LngLat } from "maplibre-gl";
 import { HomeIcon, LocationIcon, NextIcon, PrevIcon, ZoomInIcon, ZoomOutIcon } from "./Icons";
 import Button from "../roundButton/Button";
 import type { Props } from "../../utils/interfaces";
+import "./MapControls.css";
 
 /** Vista del mapa (centro + zoom) para el historial de navegación. */
 interface MapView {
@@ -10,7 +11,13 @@ interface MapView {
   zoom: number;
 }
 
-
+/**
+ * Props del componente de controles de mapa.
+ */
+interface MapControlsProps {
+  /** Instancia activa del mapa para ejecutar navegacion y zoom. */
+  map: Props["map"];
+}
 
 /**
  * Controles de navegación del mapa.
@@ -18,11 +25,11 @@ interface MapView {
  * Incluye: Home, Zoom In/Out, Mi ubicación,
  * navegación de vistas anterior/siguiente.
  */
-const MapControls: React.FC<Props> = ({ map }) => {
+const MapControls: React.FC<MapControlsProps> = ({ map }) => {
   const history = useRef<MapView[]>([]);
   const future = useRef<MapView[]>([]);
   const isNavigating = useRef(false);
-  const [initialView, setInitialView] = useState<MapView | null>(null);
+  const initialViewRef = useRef<MapView | null>(null);
   const [hasPrev, setHasPrev] = useState(false);
   const [hasNext, setHasNext] = useState(false);
   const locationMarker = useRef<Marker | null>(null);
@@ -35,7 +42,7 @@ const MapControls: React.FC<Props> = ({ map }) => {
       zoom: map.getZoom()
     };
 
-    setInitialView(init);
+    initialViewRef.current = init;
     history.current.push(init);
 
     /**
@@ -69,10 +76,10 @@ const MapControls: React.FC<Props> = ({ map }) => {
 
   /** Vuela a la vista inicial del mapa. */
   const goHome = () => {
-    if (!initialView || !map) return;
+    if (!initialViewRef.current || !map) return;
 
     isNavigating.current = true;
-    map.flyTo(initialView);
+    map.flyTo(initialViewRef.current);
   };
 
   /** Incrementa el nivel de zoom en 1. */
@@ -146,58 +153,46 @@ const MapControls: React.FC<Props> = ({ map }) => {
     });
   };
 
-  // STYLE
-  const btnStyle: React.CSSProperties = {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%",
-    border: "none",
-    background: "rgba(0,0,0,0.7)",
-    backdropFilter: "blur(6px)",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all .2s ease"
-  };
-
-  const disabledStyle: React.CSSProperties = {
-    opacity: .4,
-    cursor: "not-allowed"
-  };
-
-  const hoverStyle: React.CSSProperties = {
-    transform: "scale(1.05)",
-    background: "rgba(0,0,0,1)",
-  };
-
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 100,
-        left: 16,
-        zIndex: 1000,
-        display: "flex",
-        flexDirection: "column",
-        gap: "8px"
-      }}
-    >
+    <div className="map-controls">
 
-      <Button tooltip="Home" onClick={goHome} btnStyle={btnStyle} hoverStyle={hoverStyle} disabledStyle={disabledStyle}>
+      <Button
+        tooltip="Home"
+        onClick={goHome}
+        wrapperClassName="map-controls__item"
+        buttonClassName="map-controls__button"
+        tooltipClassName="map-controls__tooltip"
+      >
         <HomeIcon/>
       </Button>
 
-      <Button tooltip="Zoom In" onClick={zoomIn} btnStyle={btnStyle} hoverStyle={hoverStyle} disabledStyle={disabledStyle}>
+      <Button
+        tooltip="Zoom In"
+        onClick={zoomIn}
+        wrapperClassName="map-controls__item"
+        buttonClassName="map-controls__button"
+        tooltipClassName="map-controls__tooltip"
+      >
         <ZoomInIcon/>
       </Button>
 
-      <Button tooltip="Zoom Out" onClick={zoomOut} btnStyle={btnStyle} hoverStyle={hoverStyle} disabledStyle={disabledStyle}>
+      <Button
+        tooltip="Zoom Out"
+        onClick={zoomOut}
+        wrapperClassName="map-controls__item"
+        buttonClassName="map-controls__button"
+        tooltipClassName="map-controls__tooltip"
+      >
         <ZoomOutIcon/>
       </Button>
 
-      <Button tooltip="Mi ubicación" onClick={goMyLocation} btnStyle={btnStyle} hoverStyle={hoverStyle} disabledStyle={disabledStyle}>
+      <Button
+        tooltip="Mi ubicación"
+        onClick={goMyLocation}
+        wrapperClassName="map-controls__item"
+        buttonClassName="map-controls__button"
+        tooltipClassName="map-controls__tooltip"
+      >
         <LocationIcon/>
       </Button>
 
@@ -205,7 +200,9 @@ const MapControls: React.FC<Props> = ({ map }) => {
         tooltip="Vista anterior"
         onClick={goPrevious}
         disabled={!hasPrev}
-        btnStyle={btnStyle} hoverStyle={hoverStyle} disabledStyle={disabledStyle}
+        wrapperClassName="map-controls__item"
+        buttonClassName="map-controls__button"
+        tooltipClassName="map-controls__tooltip"
       >
         <PrevIcon/>
       </Button>
@@ -214,7 +211,9 @@ const MapControls: React.FC<Props> = ({ map }) => {
         tooltip="Vista siguiente"
         onClick={goNext}
         disabled={!hasNext}
-        btnStyle={btnStyle} hoverStyle={hoverStyle} disabledStyle={disabledStyle}
+        wrapperClassName="map-controls__item"
+        buttonClassName="map-controls__button"
+        tooltipClassName="map-controls__tooltip"
       >
         <NextIcon/>
       </Button>
