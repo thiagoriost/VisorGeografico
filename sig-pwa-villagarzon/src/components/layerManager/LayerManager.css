@@ -200,8 +200,11 @@
   gap: 6px;
   min-width: 180px;
   font-family: var(--ui-font-family);
-  background: var(--ui-color-surface-strong);
+  background: var(--ui-color-surface-soft);
   color: var(--ui-color-text);
+  border-radius: 20px;
+  border: 1px solid var(--ui-color-border);
+  padding: 10px 14px;
 }
 
 .feature-popup__name {
@@ -273,4 +276,9 @@
     opacity: 1;
     transform: scale(1);
   }
+}
+
+
+.maplibregl-popup-content{
+  background: transparent !important;
 }

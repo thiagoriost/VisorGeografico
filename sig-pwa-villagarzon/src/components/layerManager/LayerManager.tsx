@@ -175,7 +175,7 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
     detailsButton.ariaLabel = `Ver detalles de ${detailsData.featureName}`;
     detailsButton.addEventListener("click", () => {
       openFeatureDetails(detailsData);
-      popupRef.current?.remove();
+      // popupRef.current?.remove();
     });
 
     popupContent.append(title, coord, detailsButton);
@@ -264,8 +264,9 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
         closeFeatureDetails();
 
         const popupContent = createFeaturePopupContent(detailsData);
+        console.log({popupContent})
 
-        popupRef.current?.remove();
+        // popupRef.current?.remove();
         popupRef.current = new maplibregl.Popup()
           .setLngLat([lon, lat])
           .setDOMContent(popupContent)
