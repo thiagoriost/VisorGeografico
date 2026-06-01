@@ -15,10 +15,17 @@ import LayerManager from "./layerManager/LayerManager";
 import FeatureDetailsPanel from "./layerManager/FeatureDetailsPanel";
 import type { FeatureDetailsData } from "../utils/interfaces";
 
+const MOBILE_BREAKPOINT_QUERY = "(max-width: 767px)";
+
+const getInitialMobileState = () => {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
+};
 
 const MapView = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const [modoMovil, setModoMovil] = useState(getInitialMobileState);
   const [mapaBase, setMapaBase] = useState<string | object>(mapConfig.mapaBase);
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
@@ -34,10 +41,25 @@ const MapView = () => {
     useState<FeatureDetailsData | null>(null);
 
   useEffect(() => {
-    /* alert(`Este visor es una versión de prueba y está en desarrollo. Algunas funcionalidades pueden no estar disponibles o no funcionar correctamente. ¡Gracias por tu comprensión!
-
-      Quede en ajustar la data para agregar mas centros educativos, revisar el chatgpt y continuar con a ultima consulta falta implementarla "Ayúdame a producir una consulta para cargar TODO desde OpenStreetMap directo a mi visor" para agregar mas capas, y revisar el diseño del visor para hacerlo mas amigable.
+    /* alert(`
+      Realizar ajustes en modo movil
       `) */
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
+    const syncMobileMode = (event: MediaQueryListEvent) => {
+      setModoMovil(event.matches);
+    };
+
+    mediaQuery.addEventListener("change", syncMobileMode);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncMobileMode);
+    };
+  }, []);
+
+  useEffect(() => {
+    
     if (!mapContainer.current) return;
 
     const map = new maplibregl.Map({
@@ -88,16 +110,23 @@ const MapView = () => {
           subtitle="Visor Territorial"
           logo="/logo.png"
         />
-        <MapControls map={mapRef.current} />
-        <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
-        <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} epsg3116={epsg3116} epsg9377={epsg9377} utm={utm} utmZone={utmZone} />
-        <ScaleBar map={mapRef.current} />
-        <ScaleControl map={mapRef.current} />
-        {/* <LayerTableOfContents map={mapRef.current} /> */}
-        <LayerManager
-          map={mapRef.current}
-          onFeatureDetailsChange={setSelectedFeatureDetails}
-        />
+        {
+          !modoMovil && (
+            <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1000, backgroundColor: "rgba(255, 255, 255, 0.8)", padding: "5px 10px", borderRadius: "5px" }}>
+              Modo Móvil: Para una mejor experiencia, gira tu dispositivo a modo horizontal.
+              <MapControls map={mapRef.current} />
+              <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
+              <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} epsg3116={epsg3116} epsg9377={epsg9377} utm={utm} utmZone={utmZone} />
+              <ScaleBar map={mapRef.current} />
+              <ScaleControl map={mapRef.current} />
+              {/* <LayerTableOfContents map={mapRef.current} /> */}
+              <LayerManager
+                map={mapRef.current}
+                onFeatureDetailsChange={setSelectedFeatureDetails}
+              />
+            </div>
+          )
+        }
         {selectedFeatureDetails && (
           <FeatureDetailsPanel
             details={selectedFeatureDetails}

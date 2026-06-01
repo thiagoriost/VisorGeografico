@@ -16,7 +16,7 @@ const schools = JSON.parse(schoolsRaw) as SchoolsFeatureCollection;
 const getCurrentTimestamp = () => Date.now();
 
 const LAYER_CACHE_PREFIX = "layer-cache-v1";
-const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 horas, considerando que los datos de centros educativos no cambian frecuentemente.
 
 type LayerCacheEntry = {
   version: 1;
@@ -33,7 +33,7 @@ type LayerItem = {
 };
 
 export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [loadingLayerId, setLoadingLayerId] = useState<string | null>(null);
   const inMemoryCacheRef = useRef<Record<string, SchoolsFeatureCollection>>({});
   const popupRef = useRef<maplibregl.Popup | null>(null);
