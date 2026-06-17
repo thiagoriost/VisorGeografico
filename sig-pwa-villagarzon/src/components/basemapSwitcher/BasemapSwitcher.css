@@ -2,8 +2,8 @@
 
 .basemap-switcher {
   position: absolute;
-  top: var(--ui-space-3);
-  right: var(--ui-space-3);
+  bottom: var(--ui-space-3);
+  left: var(--ui-space-3);
   z-index: 1000;
   background: color-mix(in srgb, var(--ui-color-primary-strong) 76%, transparent);
   color: var(--ui-color-text);
@@ -38,8 +38,8 @@
 
 @media (max-width: 640px) {
   .basemap-switcher {
-    top: 72px;
-    right: var(--ui-space-2);
+    bottom: 72px;
+    left: var(--ui-space-2);
     min-width: 144px;
   }
 }

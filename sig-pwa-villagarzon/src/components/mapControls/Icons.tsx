@@ -17,8 +17,23 @@ export const ZoomOutIcon = () => (
 )
 
 export const LocationIcon = () => (
-    <svg width="18" height="18">
-        <path fill="currentColor" d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/>
+    <svg width="18" height="18" viewBox="0 0 24 24">
+        <path
+            d="M12 21s6-6.2 6-12a6 6 0 1 0-12 0c0 5.8 6 12 6 12z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <circle
+            cx="12"
+            cy="9"
+            r="2.3"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+        />
     </svg>
 )
 

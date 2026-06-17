@@ -33,7 +33,7 @@ type LayerItem = {
 };
 
 export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [loadingLayerId, setLoadingLayerId] = useState<string | null>(null);
   const inMemoryCacheRef = useRef<Record<string, SchoolsFeatureCollection>>({});
   const popupRef = useRef<maplibregl.Popup | null>(null);
@@ -361,7 +361,7 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
 
   return (
     <div className={`layer-manager-shell ${expanded ? "is-expanded" : "is-collapsed"}`}>
-      <button
+      {/* <button
         type="button"
         className="layer-manager__floating-btn"
         onClick={() => setExpanded(true)}
@@ -369,7 +369,7 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
         title="Capas"
       >
         <LayersIcon className="layer-manager__floating-icon" />
-      </button>
+      </button> */}
 
       <section className="layer-manager" aria-expanded={expanded}>
         {loadingLayer && (
@@ -377,9 +377,9 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
         )}
 
         <div className="layer-manager__header">
-          <span className="layer-manager__title">Contenido</span>
+          <span className="layer-manager__title">Capas</span>
 
-          <button
+          {/* <button
             type="button"
             onClick={() => setExpanded(false)}
             className="layer-manager__toggle-btn"
@@ -389,7 +389,7 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
             <span className="layer-manager__toggle-chevron" aria-hidden="true">
               ▾
             </span>
-          </button>
+          </button> */}
         </div>
 
         <div className="layer-manager__body">

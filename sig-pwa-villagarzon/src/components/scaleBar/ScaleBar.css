@@ -3,7 +3,7 @@
 .scale-bar {
   position: absolute;
   bottom: 40px;
-  right: var(--ui-space-3);
+  left: var(--ui-space-3);
   z-index: 1000;
   background: color-mix(in srgb, var(--ui-color-primary-strong) 76%, transparent);
   color: var(--ui-color-text);
@@ -29,7 +29,7 @@
 
 @media (max-width: 640px) {
   .scale-bar {
-    right: var(--ui-space-2);
+    /* right: var(--ui-space-2); */
     bottom: 84px;
   }
 }

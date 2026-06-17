@@ -2,7 +2,7 @@
 
 .layer-manager-shell {
   position: fixed;
-  top: 88px;
+  /* top: 88px; */
   right: var(--ui-space-4);
   z-index: var(--ui-z-floating-panel);
   font-family: var(--ui-font-family);
@@ -249,7 +249,7 @@
 @media (max-width: 640px) {
   .layer-manager-shell {
     top: auto;
-    bottom: 80px;
+    /* bottom: 80px; */
     right: var(--ui-space-3);
   }
 

@@ -14,6 +14,9 @@ import MapControls from "./mapControls/MapControls";
 import LayerManager from "./layerManager/LayerManager";
 import FeatureDetailsPanel from "./layerManager/FeatureDetailsPanel";
 import type { FeatureDetailsData } from "../utils/interfaces";
+import MobileWidgetsMenu, {
+  type MobileWidgetId,
+} from "./mobileMenu/MobileWidgetsMenu";
 
 const MOBILE_BREAKPOINT_QUERY = "(max-width: 767px)";
 
@@ -22,6 +25,14 @@ const getInitialMobileState = () => {
   return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
 };
 
+/**
+ * Retorna la funcionalidad activa inicial para modo movil.
+ */
+const getInitialActiveMobileWidget = (): MobileWidgetId => "";
+
+/**
+ * Vista principal del mapa con controles de escritorio y menu contextual en movil.
+ */
 const MapView = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -39,6 +50,9 @@ const MapView = () => {
   const [epsg9377, set9377] = useState([0, 0]);
   const [selectedFeatureDetails, setSelectedFeatureDetails] =
     useState<FeatureDetailsData | null>(null);
+  const [activeMobileWidget, setActiveMobileWidget] =
+    useState<MobileWidgetId | null>(getInitialActiveMobileWidget);
+  const [isMobileMenuExpanded, setIsMobileMenuExpanded] = useState(false);
 
   useEffect(() => {
     /* alert(`
@@ -57,6 +71,19 @@ const MapView = () => {
       mediaQuery.removeEventListener("change", syncMobileMode);
     };
   }, []);
+
+  /**
+   * En desktop no aplica menu; en movil restaura funcionalidad por defecto.
+   */
+  useEffect(() => {
+    if (modoMovil) {
+      setActiveMobileWidget((prev) => prev ?? getInitialActiveMobileWidget());
+      return;
+    }
+
+    setIsMobileMenuExpanded(false);
+    setActiveMobileWidget(null);
+  }, [modoMovil]);
 
   useEffect(() => {
     
@@ -95,7 +122,21 @@ const MapView = () => {
       if (currentZoom) setZoom(currentZoom);
     });
 
-    return () => map.remove()
+    /**
+     * Cierra el menu hamburger movil al interactuar con el mapa.
+     */
+    const handleMapInteraction = () => {
+      setIsMobileMenuExpanded(false);
+    };
+
+    mapRef.current.on("click", handleMapInteraction);
+    mapRef.current.on("touchstart", handleMapInteraction);
+
+    return () => {
+      mapRef.current?.off("click", handleMapInteraction);
+      mapRef.current?.off("touchstart", handleMapInteraction);
+      map.remove();
+    };
   }, [mapaBase]);
 
   const changeBasemap = (newStyle: string | object) => {
@@ -103,40 +144,112 @@ const MapView = () => {
     setZoom(mapConfig.zoom); // Reiniciar zoom al cambiar mapa base
   };
 
+  /**
+   * Cambia la herramienta activa en movil garantizando una sola abierta a la vez.
+   */
+  const handleSelectMobileWidget = (widget: MobileWidgetId) => {
+    setActiveMobileWidget((prev) => {
+      if (prev === widget) return null;
+      return widget;
+    });
+    setIsMobileMenuExpanded(false);
+  };
+
+  /**
+   * Alterna el estado visual del menu hamburger en movil.
+   */
+  const handleToggleMobileMenu = () => {
+    setIsMobileMenuExpanded((prev) => !prev);
+  };
+
   return (
     <>
-        <MapHeader
-          title="Sistema de Información Geográfico"
-          subtitle="Visor Territorial"
-          logo="/logo.png"
-        />
-        {
-          !modoMovil && (
-            <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1000, backgroundColor: "rgba(255, 255, 255, 0.8)", padding: "5px 10px", borderRadius: "5px" }}>
-              Modo Móvil: Para una mejor experiencia, gira tu dispositivo a modo horizontal.
-              <MapControls map={mapRef.current} />
-              <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
-              <MapStatusBar lat={lat} lng={lng} lat4686={lat4686} lng4686={lng4686} zoom={zoom} epsg3116={epsg3116} epsg9377={epsg9377} utm={utm} utmZone={utmZone} />
-              <ScaleBar map={mapRef.current} />
-              <ScaleControl map={mapRef.current} />
-              {/* <LayerTableOfContents map={mapRef.current} /> */}
-              <LayerManager
-                map={mapRef.current}
-                onFeatureDetailsChange={setSelectedFeatureDetails}
-              />
-            </div>
-          )
-        }
-        {selectedFeatureDetails && (
-          <FeatureDetailsPanel
-            details={selectedFeatureDetails}
-            onClose={() => setSelectedFeatureDetails(null)}
+      <MapHeader
+        title="Sistema de Información Geográfico"
+        subtitle="Visor Territorial"
+        logo="/logo.png"
+      />
+
+      <MapControls map={mapRef.current} />
+
+      {!modoMovil && (
+        <>
+          <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
+          <ScaleBar map={mapRef.current} />
+          <ScaleControl map={mapRef.current} />
+          <LayerManager
+            map={mapRef.current}
+            onFeatureDetailsChange={setSelectedFeatureDetails}
           />
-        )}
-        <div
+          <MapStatusBar
+              lat={lat}
+              lng={lng}
+              lat4686={lat4686}
+              lng4686={lng4686}
+              zoom={zoom}
+              epsg3116={epsg3116}
+              epsg9377={epsg9377}
+              utm={utm}
+              utmZone={utmZone}
+            />
+        </>
+      )}
+
+      {modoMovil && (
+        <>
+          <MobileWidgetsMenu
+            activeWidget={activeMobileWidget}
+            onSelectWidget={handleSelectMobileWidget}
+            isExpanded={isMobileMenuExpanded}
+            onToggleMenu={handleToggleMobileMenu}
+          />
+
+          {activeMobileWidget === "basemap" && (
+            <BasemapSwitcher onChange={changeBasemap} mapaBase={mapaBase} />
+          )}
+
+          {activeMobileWidget === "scaleBar" && (
+            <ScaleBar map={mapRef.current} />
+          )}
+
+          {activeMobileWidget === "scaleControl" && (
+            <ScaleControl map={mapRef.current} />
+          )}
+
+          {activeMobileWidget === "layerManager" && (
+            <LayerManager
+              map={mapRef.current}
+              onFeatureDetailsChange={setSelectedFeatureDetails}
+            />
+          )}
+
+          {activeMobileWidget === "mapStatusBar" && (
+            <MapStatusBar
+              lat={lat}
+              lng={lng}
+              lat4686={lat4686}
+              lng4686={lng4686}
+              zoom={zoom}
+              epsg3116={epsg3116}
+              epsg9377={epsg9377}
+              utm={utm}
+              utmZone={utmZone}
+            />
+          )}
+        </>
+      )}
+
+      {selectedFeatureDetails && (
+        <FeatureDetailsPanel
+          details={selectedFeatureDetails}
+          onClose={() => setSelectedFeatureDetails(null)}
+        />
+      )}
+
+      <div
           ref={mapContainer}
           style={{ width: "100%", height: "100vh" }}
-        />
+      />
     </>
   );
 };
