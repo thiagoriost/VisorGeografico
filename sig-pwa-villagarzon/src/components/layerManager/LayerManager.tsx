@@ -17,6 +17,10 @@ const getCurrentTimestamp = () => Date.now();
 
 const LAYER_CACHE_PREFIX = "layer-cache-v1";
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 horas, considerando que los datos de centros educativos no cambian frecuentemente.
+/**
+ * Clave de almacenamiento para persistir el estado visible/no visible de cada capa.
+ */
+const LAYER_VISIBILITY_STATE_KEY = "layer-manager:visibility-state";
 
 type LayerCacheEntry = {
   version: 1;
@@ -32,20 +36,66 @@ type LayerItem = {
   opacity: number;
 };
 
-export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
+export default function LayerManager({ map, onFeatureDetailsChange, onRequestClose }: Props) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const [expanded, setExpanded] = useState(true);
   const [loadingLayerId, setLoadingLayerId] = useState<string | null>(null);
   const inMemoryCacheRef = useRef<Record<string, SchoolsFeatureCollection>>({});
   const popupRef = useRef<maplibregl.Popup | null>(null);
 
-  const [layers, setLayers] = useState<LayerItem[]>([
-    {
-      id: "schools",
-      name: "Centros educativos",
-      visible: false,
-      opacity: 1,
-    },
-  ]);
+  /**
+   * Lee el estado persistido de visibilidad de capas para restaurar checks al montar.
+   */
+  const readPersistedVisibilityState = (): Record<string, boolean> => {
+    try {
+      const rawValue = localStorage.getItem(LAYER_VISIBILITY_STATE_KEY);
+      if (!rawValue) return {};
+
+      const parsed = JSON.parse(rawValue) as Record<string, unknown>;
+      return Object.entries(parsed).reduce<Record<string, boolean>>((acc, [key, value]) => {
+        if (typeof value === "boolean") {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+    } catch {
+      return {};
+    }
+  };
+
+  /**
+   * Persiste el estado de visibilidad actual para que sobreviva al cierre del widget.
+   */
+  const savePersistedVisibilityState = (nextLayers: LayerItem[]) => {
+    try {
+      const visibilityByLayer = nextLayers.reduce<Record<string, boolean>>(
+        (acc, layer) => {
+          acc[layer.id] = layer.visible;
+          return acc;
+        },
+        {},
+      );
+
+      localStorage.setItem(
+        LAYER_VISIBILITY_STATE_KEY,
+        JSON.stringify(visibilityByLayer),
+      );
+    } catch {
+      // localStorage puede estar bloqueado; se mantiene estado en memoria durante la sesión.
+    }
+  };
+
+  const [layers, setLayers] = useState<LayerItem[]>(() => {
+    const persistedVisibility = readPersistedVisibilityState();
+    return [
+      {
+        id: "schools",
+        name: "Centros educativos",
+        visible: persistedVisibility.schools ?? false,
+        opacity: 1,
+      },
+    ];
+  });
 
   const getSourceId = (layerId: string) => `${layerId}-source`;
   const getCircleId = (layerId: string) => `${layerId}-circle`;
@@ -135,6 +185,45 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
   useEffect(() => {
     purgeExpiredLayerCaches();
   }, []);
+
+  /**
+   * Sincroniza el estado de visibilidad hacia localStorage cada vez que cambia.
+   */
+  useEffect(() => {
+    savePersistedVisibilityState(layers);
+  }, [layers]);
+
+  /**
+   * Cierra el panel de capas cuando ocurre un click/touch fuera del widget.
+   */
+  useEffect(() => {
+    /**
+     * Dispara cierre completo cuando el contenedor lo soporta; si no, aplica colapso local.
+     */
+    const handlePointerOutside = (event: MouseEvent | TouchEvent) => {
+      if (!expanded) return;
+      const rootElement = rootRef.current;
+      if (!rootElement) return;
+
+      const target = event.target as Node | null;
+      if (target && !rootElement.contains(target)) {
+        if (onRequestClose) {
+          onRequestClose();
+          return;
+        }
+
+        setExpanded(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerOutside);
+    document.addEventListener("touchstart", handlePointerOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerOutside);
+      document.removeEventListener("touchstart", handlePointerOutside);
+    };
+  }, [expanded, onRequestClose]);
 
   useEffect(() => {
     return () => {
@@ -264,7 +353,6 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
         closeFeatureDetails();
 
         const popupContent = createFeaturePopupContent(detailsData);
-        console.log({popupContent})
 
         // popupRef.current?.remove();
         popupRef.current = new maplibregl.Popup()
@@ -284,6 +372,9 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
     setLayerVisibility(layer.id, true);
   };
 
+  /**
+   * Alterna una capa, sincroniza su visibilidad en el mapa y persiste el estado del check.
+   */
   const toggleLayer = async (layerId: string) => {
     const targetLayer = layers.find((layer) => layer.id === layerId);
     if (!targetLayer) return;
@@ -300,11 +391,14 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
       }
     }
 
-    setLayers((prev) =>
-      prev.map((layer) =>
+    setLayers((prev) => {
+      const nextLayers = prev.map((layer) =>
         layer.id === layerId ? { ...layer, visible: newVisible } : layer,
-      ),
-    );
+      );
+
+      savePersistedVisibilityState(nextLayers);
+      return nextLayers;
+    });
   };
 
   /* const updateOpacity = (layerId: string, opacity: number) => {
@@ -360,7 +454,10 @@ export default function LayerManager({ map, onFeatureDetailsChange }: Props) {
   const panelStateLabel = expanded ? "Minimizar panel de capas" : "Maximizar panel de capas";
 
   return (
-    <div className={`layer-manager-shell ${expanded ? "is-expanded" : "is-collapsed"}`}>
+    <div
+      ref={rootRef}
+      className={`layer-manager-shell ${expanded ? "is-expanded" : "is-collapsed"}`}
+    >
       {/* <button
         type="button"
         className="layer-manager__floating-btn"

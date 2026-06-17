@@ -13,4 +13,8 @@ export interface Props {
   onChange?: (style: string | object) => void;
   mapaBase?: string | object;
   onFeatureDetailsChange?: (details: FeatureDetailsData | null) => void;
+  /**
+   * Solicita al contenedor cerrar completamente el widget (desmontarlo).
+   */
+  onRequestClose?: () => void;
 }

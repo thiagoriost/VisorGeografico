@@ -162,6 +162,13 @@ const MapView = () => {
     setIsMobileMenuExpanded((prev) => !prev);
   };
 
+  /**
+   * Cierra por completo el widget de capas en movil, liberando su renderizado.
+   */
+  const handleCloseMobileLayerManager = () => {
+    setActiveMobileWidget(null);
+  };
+
   return (
     <>
       <MapHeader
@@ -220,6 +227,7 @@ const MapView = () => {
             <LayerManager
               map={mapRef.current}
               onFeatureDetailsChange={setSelectedFeatureDetails}
+              onRequestClose={handleCloseMobileLayerManager}
             />
           )}
 
