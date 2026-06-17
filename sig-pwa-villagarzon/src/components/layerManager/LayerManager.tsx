@@ -22,6 +22,28 @@ const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 horas, considerando que los datos 
  */
 const LAYER_VISIBILITY_STATE_KEY = "layer-manager:visibility-state";
 
+/**
+ * Limpia el estado persistido de checks cuando la navegacion es una recarga.
+ */
+const clearPersistedVisibilityStateOnReload = () => {
+
+  if (typeof window === "undefined") return;
+
+  const navigationEntry = performance.getEntriesByType("navigation")[0] as
+    | PerformanceNavigationTiming
+    | undefined;
+
+  if (navigationEntry?.type !== "reload") return;
+
+  try {
+    localStorage.removeItem(LAYER_VISIBILITY_STATE_KEY);
+  } catch {
+    // Si localStorage no esta disponible, no se requiere accion adicional.
+  }
+};
+
+clearPersistedVisibilityStateOnReload();
+
 type LayerCacheEntry = {
   version: 1;
   savedAt: number;
@@ -183,7 +205,7 @@ export default function LayerManager({ map, onFeatureDetailsChange, onRequestClo
   };
 
   useEffect(() => {
-    purgeExpiredLayerCaches();
+    purgeExpiredLayerCaches();    
   }, []);
 
   /**
