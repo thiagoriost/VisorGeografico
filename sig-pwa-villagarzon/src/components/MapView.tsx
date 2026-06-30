@@ -50,6 +50,11 @@ const MapView = () => {
   const [epsg9377, set9377] = useState([0, 0]);
   const [selectedFeatureDetails, setSelectedFeatureDetails] =
     useState<FeatureDetailsData | null>(null);
+  /**
+   * Mensaje de error cuando el contexto WebGL no puede crearse.
+   * Nulo en condiciones normales de operacion.
+   */
+  const [mapInitError, setMapInitError] = useState<string | null>(null);
   const [activeMobileWidget, setActiveMobileWidget] =
     useState<MobileWidgetId | null>(getInitialActiveMobileWidget);
   const [isMobileMenuExpanded, setIsMobileMenuExpanded] = useState(false);
@@ -86,16 +91,34 @@ const MapView = () => {
   }, [modoMovil]);
 
   useEffect(() => {
-    
     if (!mapContainer.current) return;
 
-    const map = new maplibregl.Map({
-      container: mapContainer.current,
-      style: mapaBase as maplibregl.StyleSpecification | string,
-      center: mapConfig.center as [number, number],
-      zoom: mapConfig.zoom
-    });
+    /**
+     * Instancia del mapa para el estilo activo. Se reemplaza cada vez que
+     * el usuario cambia el mapa base.
+     *
+     * La construccion del mapa se envuelve en try-catch porque
+     * `maplibregl.Map` lanza un error sincrono (`webglcontextcreationerror`)
+     * cuando WebGL no esta disponible o el contexto no puede crearse, lo
+     * que de lo contrario dejaria el componente en un estado no renderizable
+     * sin ningun aviso al usuario.
+     */
+    let map: maplibregl.Map;
+    try {
+      map = new maplibregl.Map({
+        container: mapContainer.current,
+        style: mapaBase as maplibregl.StyleSpecification | string,
+        center: mapConfig.center as [number, number],
+        zoom: mapConfig.zoom
+      });
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Error desconocido al iniciar el mapa";
+      setMapInitError(message);
+      return;
+    }
 
+    setMapInitError(null);
     mapRef.current = map;
 
     // Evento movimiento cursor
@@ -168,6 +191,38 @@ const MapView = () => {
   const handleCloseMobileLayerManager = () => {
     setActiveMobileWidget(null);
   };
+
+  if (mapInitError) {
+    return (
+      <div
+        role="alert"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          padding: "2rem",
+          fontFamily: "sans-serif",
+          textAlign: "center",
+          gap: "0.75rem",
+        }}
+      >
+        <strong>No se pudo inicializar el mapa</strong>
+        <p style={{ fontSize: "0.875rem", color: "#555", maxWidth: 480 }}>
+          Verifica que la aceleracion de hardware este habilitada en el navegador
+          y que la variable <code>VITE_MAPTILER_API_KEY</code> en{" "}
+          <code>.env.local</code> contenga una clave valida.
+        </p>
+        <details style={{ fontSize: "0.75rem", color: "#888" }}>
+          <summary>Detalle tecnico</summary>
+          <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+            {mapInitError}
+          </pre>
+        </details>
+      </div>
+    );
+  }
 
   return (
     <>

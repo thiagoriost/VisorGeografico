@@ -1,97 +1,252 @@
-# React + TypeScript + Vite
+# SIG-PWA-VILLAGARZON
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Visor geografico web desarrollado con React, TypeScript, Vite y MapLibre GL para consulta territorial en el municipio de Villagarzon.
 
-Currently, two official plugins are available:
+Este documento resume el estado funcional actual de la aplicacion para auditoria tecnica y deja recomendaciones de evolucion.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 1. Alcance funcional actual
 
-## React Compiler
+### 1.1 Vista principal de mapa
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- Renderiza un mapa base configurable con centro inicial en Villagarzon.
+- Muestra encabezado institucional con titulo, subtitulo y logo.
+- Dispone de controles flotantes para navegacion y utilidades cartograficas.
+- Soporta modo escritorio y modo movil con widgets desacoplados.
 
-Note: This will impact Vite dev & build performances.
+Archivos clave:
+- src/components/MapView.tsx
+- src/config/mapConfig.ts
+- src/components/mapHeader/MapHeader.tsx
 
-## Ajustes funcionales recientes (Visor)
+### 1.2 Mapas base
 
-Se implementaron mejoras en la gestion de detalles de features para mantener componentes desacoplados y mejorar la experiencia en mapa:
+Mapas base disponibles:
+- Politico (demo MapLibre)
+- OpenStreetMap (OpenFreeMap Liberty)
+- Satelital 1 (MapTiler Hybrid con API key via variables de entorno)
+- Satelital 2 (ArcGIS World Imagery como raster, con token opcional via variables de entorno)
 
-- `FeatureDetailsPanel` ahora es arrastrable (drag and drop) desde su cabecera.
-- `FeatureDetailsPanel` maneja internamente estado de minimizar/expandir y cierre.
-- `FeatureDetailsPanel` se renderiza en `MapView` para flotar sobre todo el mapa, no dentro del contenedor de `LayerManager`.
-- `LayerManager` ahora solo emite el feature seleccionado mediante `onFeatureDetailsChange`, quedando independiente de la UI de detalles.
-- Al cerrar o remover el popup de MapLibre (incluyendo click fuera), tambien se cierra el panel de detalles.
-- El panel de detalles incluye un espacio preparado para imagen (`imageUrl`) con placeholder cuando aun no hay foto.
+Comportamiento:
+- Al cambiar mapa base se reinicia el zoom al nivel configurado por defecto.
 
-### Contrato de comunicacion
+Archivos clave:
+- src/components/basemapSwitcher/BasemapSwitcher.tsx
+- src/config/basemaps.ts
 
-`LayerManager` y `MapView` se comunican con el tipo `FeatureDetailsData` definido en `src/utils/interfaces.ts`:
+### 1.3 Controles de mapa
 
-- `featureName: string`
-- `lat: number`
-- `lon: number`
-- `imageUrl?: string`
+Controles implementados:
+- Home (volver a vista inicial)
+- Zoom in
+- Zoom out
+- Mi ubicacion (geolocalizacion + marcador con toggle)
+- Vista anterior
+- Vista siguiente
 
-`LayerManager` invoca `onFeatureDetailsChange(details)` para abrir/actualizar detalles y `onFeatureDetailsChange(null)` para cerrarlos.
+Notas:
+- Se mantiene historial de navegacion por vistas con pilas de backward/forward.
 
-## Expanding the ESLint configuration
+Archivo clave:
+- src/components/mapControls/MapControls.tsx
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1.4 Barra de estado y sistemas de coordenadas
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Muestra coordenadas en:
+- EPSG:4686
+- EPSG:3116
+- EPSG:9377
+- UTM (zona automatica)
+- WGS84
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Adicional:
+- Muestra zoom actual.
+- Modo compacto y expandido.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Archivos clave:
+- src/components/mapStatusBar/MapStatusBar.tsx
+- src/utils/projections.ts
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 1.5 Escala
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Widgets de escala:
+- Barra grafica de escala dinamica por movimiento del mapa.
+- Control de escala nominal con selector (ajusta zoom por escala seleccionada).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Archivos clave:
+- src/components/scaleBar/ScaleBar.tsx
+- src/components/scaleControl/ScaleControl.tsx
+
+### 1.6 Gestion de capas tematicas
+
+Capa implementada actualmente:
+- Centros educativos (puntos)
+
+Comportamiento:
+- Activacion/desactivacion por checkbox.
+- Simbolizacion circular en mapa.
+- Popup por feature con boton Ver detalles.
+- Cierre de popup cierra tambien panel de detalles.
+- Si se apaga la capa, se cierra popup y panel de detalles.
+
+Datos:
+- Fuente online prioritaria: Overpass API (OSM) filtrada por amenity=school en Villagarzon.
+- Fallback offline: src/data/centrosEducativos.geojson.
+
+Cache y persistencia:
+- Cache en memoria por sesion para evitar recargas repetidas.
+- Cache en localStorage por capa con TTL de 6 horas.
+- Limpieza automatica de entradas expiradas.
+- Persistencia de checks de visibilidad en localStorage.
+- En recarga dura del navegador se limpia el estado de visibilidad persistido.
+
+Archivos clave:
+- src/components/layerManager/LayerManager.tsx
+- src/services/osmService.ts
+- src/data/centrosEducativos.geojson
+
+### 1.7 Panel de detalles de feature
+
+Caracteristicas:
+- Panel flotante global (independiente del widget de capas).
+- Arrastrable desde cabecera.
+- Minimizar / expandir.
+- Cierre manual.
+- Presenta nombre, latitud, longitud e imagen opcional.
+- Placeholder cuando no existe imageUrl.
+
+Contrato entre componentes:
+- Tipo FeatureDetailsData: featureName, lat, lon, imageUrl opcional.
+- LayerManager emite detalles via onFeatureDetailsChange.
+- MapView mantiene el estado del feature seleccionado y renderiza el panel.
+
+Archivos clave:
+- src/components/layerManager/FeatureDetailsPanel.tsx
+- src/utils/interfaces.ts
+- src/components/MapView.tsx
+
+### 1.8 Modo movil
+
+Comportamiento:
+- Activacion automatica por media query max-width 767px.
+- Menu hamburguesa para widgets.
+- Solo un widget activo a la vez.
+- Cierre del menu al interactuar con mapa.
+- Cierre completo del widget de capas desde callback onRequestClose.
+
+Widgets movil:
+- Mapas base
+- Barra de escala
+- Escala
+- Capas
+- Barra de estado
+
+Archivos clave:
+- src/components/mobileMenu/MobileWidgetsMenu.tsx
+- src/components/MapView.tsx
+
+## 2. Estado tecnico
+
+### 2.1 Stack y librerias
+
+- React 19
+- TypeScript 6
+- Vite 7
+- MapLibre GL JS
+- proj4
+- React Compiler habilitado mediante plugin Babel
+
+Archivos clave:
+- package.json
+- vite.config.ts
+
+### 2.2 Estado PWA
+
+Se encuentra integrado vite-plugin-pwa con registerType autoUpdate.
+
+Observacion de auditoria:
+- No se evidencian en el repositorio configuraciones explicitas de manifest personalizado, iconos PWA dedicados ni estrategia de runtime caching definida en el plugin.
+- El proyecto tiene base para PWA, pero la madurez PWA aun parece inicial/intermedia.
+
+Archivo clave:
+- vite.config.ts
+
+### 2.3 Seguridad de credenciales cartograficas
+
+Estado actual:
+- La clave de MapTiler ya no esta embebida en codigo fuente.
+- Se utilizan variables de entorno de Vite para credenciales de proveedores cartograficos.
+
+Variables esperadas en `.env.local`:
+- VITE_MAPTILER_API_KEY
+- VITE_ARCGIS_API_KEY (opcional, solo si el servicio ArcGIS requiere token)
+
+Recomendacion operativa obligatoria:
+- Restringir dominios permitidos de la API key en la consola del proveedor (MapTiler/ArcGIS) para aceptar unicamente dominios de despliegue autorizados.
+- Mantener entornos separados (desarrollo, pruebas, produccion) con claves distintas y rotacion periodica.
+
+
+## 3. Recomendaciones futuras (priorizadas)
+
+### Prioridad alta
+
+1. Seguridad de credenciales cartograficas
+- Hecho: API key de MapTiler movida a variables de entorno Vite.
+- Hecho: soporte de token ArcGIS via variables de entorno.
+- Pendiente operativo: restringir dominios permitidos desde consola del proveedor.
+
+2. Endurecer flujo de datos OSM
+- Manejar errores HTTP y timeouts de forma explicita en servicio OSM.
+- Registrar metrica de uso de fallback offline para monitoreo.
+
+3. Fortalecer contrato de datos de features
+- Incluir id unico de feature en FeatureDetailsData.
+- Agregar campos tematicos adicionales para el panel de detalle.
+
+### Prioridad media
+
+4. Cobertura de pruebas
+- Tests unitarios para proyecciones y transformaciones.
+- Tests de componentes para LayerManager y FeatureDetailsPanel.
+- Pruebas de integracion de flujo: capa -> popup -> detalles -> cierre.
+
+5. Evolucion de capacidades SIG
+- Multiples capas tematicas con configuracion declarativa.
+- Leyenda por capa y filtros por atributos.
+- Control de orden de capas y opacidad (ya hay base comentada).
+
+6. Madurez PWA
+- Definir manifest completo (nombre, short_name, iconos, colores).
+- Configurar cache offline de assets criticos y datos base.
+- Implementar flujo de actualizacion con aviso al usuario.
+
+### Prioridad baja
+
+7. Observabilidad y telemetria tecnica
+- Tiempos de carga por capa.
+- Tasa de fallos de Overpass.
+- Errores de geolocalizacion en cliente.
+
+8. Documentacion funcional continua
+- Mantener una seccion de changelog por sprint.
+- Agregar matriz de trazabilidad: requisito funcional -> componente -> prueba.
+
+## 4. Ejecucion del proyecto
+
+Comandos principales:
+- npm install
+- npm run dev
+- npm run build
+- npm run preview
+- npm run lint
+
+## 5. Estructura funcional de referencia
+
+- src/components/MapView.tsx: orquestacion principal del visor.
+- src/components/layerManager/LayerManager.tsx: gestion de capas, cache y popup.
+- src/components/layerManager/FeatureDetailsPanel.tsx: panel de detalle flotante.
+- src/services/osmService.ts: consulta de centros educativos a Overpass.
+- src/utils/projections.ts: conversiones EPSG y UTM.
+
+## 6. Nota de mantenimiento
+
+Cada cambio funcional debe reflejarse en este README para conservar valor de auditoria. Se recomienda actualizar este documento en el mismo PR donde se modifica la funcionalidad.
